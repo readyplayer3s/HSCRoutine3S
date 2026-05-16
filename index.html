@@ -76,7 +76,7 @@
   .title-block h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--amber); text-shadow: 0 0 20px rgba(240,165,0,0.4); line-height: 1; margin: 0; }
   .title-block p { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 2px; margin-top: 4px; margin-bottom: 0; }
   
-  .stats-row { display: flex; gap: 20px; flex-wrap: wrap; }
+  .stats-row { display: flex; gap: 20px; flex-wrap: wrap; margin-left: auto; }
   .stat { text-align: center; }
   .stat-val { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; color: var(--cyan); line-height: 1; text-shadow: 0 0 15px rgba(0,212,255,0.3); transition: color 0.3s ease; }
   .stat-label { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
@@ -247,6 +247,17 @@
     box-shadow: 0 0 8px rgba(0,212,255,0.6);
     animation: pulse-dot 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
+  .offline-status.update-available {
+    border-color: var(--amber);
+    background: rgba(240,165,0,0.1);
+    color: var(--amber);
+    cursor: pointer;
+  }
+  .offline-status.update-available .offline-status-dot {
+    background: var(--amber);
+    box-shadow: 0 0 10px rgba(240,165,0,0.6);
+    animation: pulse-dot 1.1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
   @keyframes pulse-dot {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.6; transform: scale(1.2); }
@@ -313,11 +324,17 @@
     body.sidebar-open { padding-left: 0; } 
     .sidebar { width: 85vw; max-width: 320px; box-shadow: none; } 
     body.sidebar-open .sidebar { box-shadow: 0 0 0 100vw rgba(0,0,0,0.75); }
+    .header-top { flex-direction: column; align-items: stretch; gap: 10px; }
+    .title-block { width: 100%; }
+    .stats-row { width: 100%; justify-content: space-between; margin-left: 0; }
   }
   @media (max-width: 600px) { 
     .grid-container { padding: 12px; } 
     .grid-col { min-width: 100%; } 
     .stats-row { gap: 12px; } 
+    .title-block { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .title-block h1 { font-size: 24px; letter-spacing: 2px; }
+    .offline-status { font-size: 10px; padding: 4px 8px; letter-spacing: 0.7px; }
     header { padding: 12px 16px; } 
     .controls { padding: 12px 16px; gap: 6px; } 
     .day-card.expanded { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 0 1px var(--amber); }
@@ -1119,7 +1136,34 @@ renderSidebar();
 renderGrid();
 
 // ─── OFFLINE STATUS DETECTION ──────────────────────────────────
-function updateOfflineStatus(showChecking = false) {
+let offlineStatusRequestId = 0;
+let updateAvailable = false;
+
+async function isAppShellCached(candidates) {
+  const cacheNames = await caches.keys();
+  const relevantCacheNames = cacheNames.filter(name => name.toLowerCase().includes('hsc-routine'));
+  const namesToCheck = relevantCacheNames.length ? relevantCacheNames : cacheNames;
+
+  for (const cacheName of namesToCheck) {
+    const cache = await caches.open(cacheName);
+    for (const candidate of candidates) {
+      const hit = await cache.match(candidate);
+      if (hit) return true;
+    }
+  }
+
+  for (const candidate of candidates) {
+    const hit = await caches.match(candidate);
+    if (hit) return true;
+  }
+
+  return false;
+}
+
+async function updateOfflineStatus(showChecking = false) {
+  if (updateAvailable) return;
+
+  const requestId = ++offlineStatusRequestId;
   const statusEl = document.getElementById('offline-status');
   const statusText = document.getElementById('offline-status-text');
   
@@ -1129,52 +1173,75 @@ function updateOfflineStatus(showChecking = false) {
   if ('serviceWorker' in navigator && 'caches' in window) {
     if (showChecking) {
       statusEl.classList.add('checking');
-      statusEl.classList.remove('cached', 'not-cached');
+      statusEl.classList.remove('cached', 'not-cached', 'update-available');
       statusText.textContent = 'Checking...';
     }
 
-    // Check if index/app shell is cached (scope-aware)
-    caches.open('hsc-routine-v1').then(cache => {
-      const candidates = [
-        new URL('./index.html', window.location.href).href,
-        window.location.href,
-        window.location.pathname,
-        './index.html',
-        './',
-        '/index.html',
-        '/'
-      ];
+    const candidates = [
+      new URL('./index.html', window.location.href).href,
+      new URL('./', window.location.href).href,
+      window.location.href,
+      window.location.pathname,
+      './index.html',
+      './',
+      '/index.html',
+      '/'
+    ];
 
-      Promise.all(candidates.map(candidate => cache.match(candidate)))
-      .then(matches => {
-        if (matches.some(Boolean)) {
-          statusEl.classList.remove('checking', 'not-cached');
-          statusEl.classList.add('cached');
-          statusText.textContent = 'Available Offline';
-          statusEl.title = 'This page is cached and should work offline';
-        } else {
-          statusEl.classList.remove('checking', 'cached');
-          statusEl.classList.add('not-cached');
-          statusText.textContent = 'Not Available Offline';
-          statusEl.title = 'Offline cache not ready yet. Keep page online for a moment.';
-        }
-      });
-    }).catch(() => {
-      statusEl.classList.remove('checking', 'cached');
+    try {
+      const cached = await isAppShellCached(candidates);
+      if (requestId !== offlineStatusRequestId) return;
+
+      if (cached) {
+        statusEl.classList.remove('checking', 'not-cached', 'update-available');
+        statusEl.classList.add('cached');
+        statusText.textContent = 'Available Offline';
+        statusEl.title = 'This page is cached and should work offline';
+      } else {
+        statusEl.classList.remove('checking', 'cached', 'update-available');
+        statusEl.classList.add('not-cached');
+        statusText.textContent = 'Not Available Offline';
+        statusEl.title = 'Offline cache not ready yet. Keep page online for a moment.';
+      }
+    } catch {
+      if (requestId !== offlineStatusRequestId) return;
+      statusEl.classList.remove('checking', 'cached', 'update-available');
       statusEl.classList.add('not-cached');
       statusText.textContent = 'Not Available Offline';
       statusEl.title = 'Could not read offline cache';
-    });
+    }
   } else {
-    statusEl.classList.remove('checking', 'cached');
+    statusEl.classList.remove('checking', 'cached', 'update-available');
     statusEl.classList.add('not-cached');
     statusText.textContent = 'Not Available Offline';
     statusEl.title = 'Your browser does not support offline mode';
   }
 }
 
+function showRefreshAvailable() {
+  const statusEl = document.getElementById('offline-status');
+  const statusText = document.getElementById('offline-status-text');
+  if (!statusEl || !statusText) return;
+
+  updateAvailable = true;
+  statusEl.classList.remove('checking', 'cached', 'not-cached');
+  statusEl.classList.add('update-available');
+  statusText.textContent = 'Refresh Available';
+  statusEl.title = 'A new version is ready. Click to refresh.';
+}
+
 // Update status on page load
 window.addEventListener('load', () => updateOfflineStatus(true));
+
+window.addEventListener('hsc-update-available', showRefreshAvailable);
+
+const offlineStatusEl = document.getElementById('offline-status');
+if (offlineStatusEl) {
+  offlineStatusEl.addEventListener('click', () => {
+    if (!updateAvailable) return;
+    window.location.reload();
+  });
+}
 
 // Listen for online/offline events
 window.addEventListener('online', () => updateOfflineStatus(false));

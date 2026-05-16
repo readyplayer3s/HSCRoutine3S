@@ -53,6 +53,20 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // For page navigations, prefer network so users receive updated HTML.
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, responseToCache));
+          return response;
+        })
+        .catch(() => caches.match(request).then(resp => resp || caches.match('./index.html').then(fallback => fallback || caches.match('./'))))
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(request)
       .then(response => {
