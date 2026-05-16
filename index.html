@@ -301,6 +301,146 @@
   .danger-btn { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 1px; padding: 4px 10px; border: 1px solid var(--red-dim); background: transparent; color: var(--red-dim); cursor: pointer; border-radius: 3px; transition: all 0.2s ease; margin-left: 8px; }
   .danger-btn:hover { border-color: var(--red); color: var(--red); background: rgba(255,0,0,0.05); }
 
+  /* RESET MODAL */
+  .reset-modal {
+    position: fixed; inset: 0; z-index: 5000;
+    display: none; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    padding: 16px;
+  }
+  .reset-modal.open { display: flex; }
+  .reset-modal-panel {
+    width: min(520px, 96vw);
+    background: linear-gradient(180deg, var(--bg2), #0f1520);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.6);
+    overflow: hidden;
+  }
+  .reset-modal-head {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,0,0,0.05);
+    color: var(--red);
+    font-family: 'Barlow Condensed', sans-serif;
+    letter-spacing: 1.5px;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .reset-modal-body { padding: 16px; }
+  .reset-modal-subtext {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+  .reset-option-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .reset-option-btn {
+    text-align: left;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg3);
+    color: var(--text);
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .reset-option-btn:hover {
+    border-color: var(--amber);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+  }
+  .reset-option-btn strong {
+    display: block;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: var(--text-bright);
+    text-transform: uppercase;
+  }
+  .reset-option-btn span {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .reset-confirm {
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px solid var(--amber-dim);
+    background: rgba(240,165,0,0.08);
+    border-radius: 6px;
+    display: none;
+  }
+  .reset-confirm.open { display: block; }
+  .reset-confirm p {
+    margin: 0 0 10px 0;
+    color: var(--text);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .reset-confirm-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+  .reset-confirm-yes, .reset-confirm-no {
+    border-radius: 4px;
+    padding: 7px 12px;
+    cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .reset-confirm-yes {
+    border: 1px solid var(--red);
+    background: rgba(255,68,68,0.14);
+    color: var(--red);
+  }
+  .reset-confirm-yes:hover {
+    background: rgba(255,68,68,0.2);
+  }
+  .reset-confirm-no {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+  }
+  .reset-confirm-no:hover {
+    border-color: var(--text);
+    color: var(--text);
+  }
+  .reset-modal-foot {
+    border-top: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .reset-close-btn {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    cursor: pointer;
+  }
+  .reset-close-btn:hover {
+    border-color: var(--text);
+    color: var(--text);
+  }
+
   .guide-toggle { width: 100%; padding: 12px 24px; background: var(--bg3); border: none; border-bottom: 1px solid var(--border); color: var(--cyan); font-family: 'Share Tech Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.2s ease; position: relative; z-index: 1; text-align: left; }
   .guide-toggle:hover { background: #181f2a; color: #fff; }
   .guide-toggle .arrow { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: inline-block; }
@@ -421,6 +561,41 @@
   <button onclick="toggleSidebar()" style="position:absolute; right:16px; top:16px; background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:20px; z-index: 10; transition: color 0.2s;">✕</button>
   <h2 style="font-family:'Barlow Condensed',sans-serif; color:var(--cyan); letter-spacing:2px; margin-bottom:20px;">SUBJECT TRACKER</h2>
   <div id="sidebar-content"></div>
+</div>
+
+<div class="reset-modal" id="reset-modal" aria-hidden="true">
+  <div class="reset-modal-panel" role="dialog" aria-modal="true" aria-labelledby="reset-modal-title">
+    <div class="reset-modal-head" id="reset-modal-title">Reset Planner Data</div>
+    <div class="reset-modal-body">
+      <p class="reset-modal-subtext">Choose what you want to reset. Then confirm with Yes or No.</p>
+
+      <div class="reset-option-grid" id="reset-option-grid">
+        <button class="reset-option-btn" data-reset-mode="full" type="button">
+          <strong>Full Reset</strong>
+          <span>Clear progress + swaps and start fresh.</span>
+        </button>
+        <button class="reset-option-btn" data-reset-mode="progress" type="button">
+          <strong>Progress Only</strong>
+          <span>Clear checkmarks and chapter progress, keep swaps.</span>
+        </button>
+        <button class="reset-option-btn" data-reset-mode="swaps" type="button">
+          <strong>Swaps Only</strong>
+          <span>Clear custom slot edits, keep progress.</span>
+        </button>
+      </div>
+
+      <div class="reset-confirm" id="reset-confirm-box">
+        <p id="reset-confirm-text">Are you sure?</p>
+        <div class="reset-confirm-actions">
+          <button class="reset-confirm-no" id="reset-confirm-no" type="button">No</button>
+          <button class="reset-confirm-yes" id="reset-confirm-yes" type="button">Yes, Reset</button>
+        </div>
+      </div>
+    </div>
+    <div class="reset-modal-foot">
+      <button class="reset-close-btn" id="reset-close-btn" type="button">Close</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -1160,36 +1335,70 @@ document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
   });
 });
 
-document.getElementById('reset-btn').addEventListener('click', () => {
-  const choice = prompt(
-    'Reset Options:\n1 = Full reset (progress + swaps)\n2 = Progress only\n3 = Swaps only\n\nType 1, 2, or 3:'
-  );
+const resetModalEl = document.getElementById('reset-modal');
+const resetOptionGridEl = document.getElementById('reset-option-grid');
+const resetConfirmBoxEl = document.getElementById('reset-confirm-box');
+const resetConfirmTextEl = document.getElementById('reset-confirm-text');
+const resetConfirmYesEl = document.getElementById('reset-confirm-yes');
+const resetConfirmNoEl = document.getElementById('reset-confirm-no');
+const resetCloseBtnEl = document.getElementById('reset-close-btn');
+let pendingResetMode = null;
 
-  if (choice === null) return;
+function getResetConfirmMessage(mode) {
+  if (mode === 'full') return 'This will clear all progress and swaps. Continue?';
+  if (mode === 'progress') return 'This will clear progress only and keep swaps. Continue?';
+  return 'This will clear swaps only and keep progress. Continue?';
+}
 
-  const selected = choice.trim();
-  if (!['1', '2', '3'].includes(selected)) {
-    alert('Invalid option. Reset cancelled.');
-    return;
+function closeResetModal() {
+  if (!resetModalEl || !resetConfirmBoxEl) return;
+  resetModalEl.classList.remove('open');
+  resetModalEl.setAttribute('aria-hidden', 'true');
+  resetConfirmBoxEl.classList.remove('open');
+  pendingResetMode = null;
+}
+
+function openResetModal() {
+  if (!resetModalEl || !resetConfirmBoxEl) return;
+  resetModalEl.classList.add('open');
+  resetModalEl.setAttribute('aria-hidden', 'false');
+  resetConfirmBoxEl.classList.remove('open');
+  pendingResetMode = null;
+}
+
+document.getElementById('reset-btn').addEventListener('click', openResetModal);
+
+if (resetOptionGridEl && resetConfirmBoxEl && resetConfirmTextEl) {
+  resetOptionGridEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('.reset-option-btn');
+    if (!btn) return;
+    pendingResetMode = btn.dataset.resetMode;
+    resetConfirmTextEl.textContent = getResetConfirmMessage(pendingResetMode);
+    resetConfirmBoxEl.classList.add('open');
+  });
+}
+
+if (resetConfirmYesEl) {
+  resetConfirmYesEl.addEventListener('click', () => {
+    if (!pendingResetMode) return;
+    runReset(pendingResetMode);
+    closeResetModal();
+  });
+}
+
+if (resetConfirmNoEl) resetConfirmNoEl.addEventListener('click', closeResetModal);
+if (resetCloseBtnEl) resetCloseBtnEl.addEventListener('click', closeResetModal);
+
+if (resetModalEl) {
+  resetModalEl.addEventListener('click', (e) => {
+    if (e.target === resetModalEl) closeResetModal();
+  });
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && resetModalEl && resetModalEl.classList.contains('open')) {
+    closeResetModal();
   }
-
-  if (selected === '1') {
-    if (!confirm('Full reset will clear all progress and swaps. Continue?')) return;
-    runReset('full');
-    alert('Full reset complete.');
-    return;
-  }
-
-  if (selected === '2') {
-    if (!confirm('Reset only progress tracking and keep swaps?')) return;
-    runReset('progress');
-    alert('Progress reset complete.');
-    return;
-  }
-
-  if (!confirm('Reset only swaps/custom slot edits and keep progress?')) return;
-  runReset('swaps');
-  alert('Swaps reset complete.');
 });
 
 document.getElementById('guide-toggle').addEventListener('click', function() { 
