@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HSC 2026 — 50-Day Sprint</title>
+<title>HSC 2026 — Max Sprint</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Share+Tech+Mono&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -41,12 +41,10 @@
 
   body {
     background: var(--bg); color: var(--text); font-family: 'Barlow', sans-serif;
-    min-height: 100vh; padding-left: 0; 
-    transition: padding-left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  body.sidebar-open { padding-left: 320px; }
 
   /* Ambient Background */
   body::before {
@@ -94,6 +92,10 @@
   .filter-btn:hover { border-color: var(--cyan); color: var(--cyan); transform: translateY(-1px); }
   .filter-btn.active { background: var(--cyan); border-color: var(--cyan); color: #000; box-shadow: 0 0 15px rgba(0,212,255,0.2); }
   .filter-btn[data-filter="DONE"].active { background: var(--green); border-color: var(--green); color: #000; box-shadow: 0 0 15px rgba(0,255,136,0.2); }
+  .controls.subject-mode .filter-label,
+  .controls.subject-mode .filter-btn[data-filter] {
+    display: none;
+  }
 
   /* DYNAMIC MASONRY GRID */
   .grid-container { padding: 24px; display: flex; align-items: flex-start; gap: 16px; position: relative; z-index: 1; }
@@ -258,25 +260,76 @@
     box-shadow: 0 0 10px rgba(240,165,0,0.6);
     animation: none;
   }
-  @keyframes pulse-dot {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(1.2); }
-  }
 
   /* CARD PROGRESS */
   .card-progress { height: 4px; background: var(--bg); width: 100%; margin-top: auto; border-top: 1px solid var(--border); transform: translateZ(0); }
   .card-progress-fill { height: 100%; background: linear-gradient(90deg, var(--green-dim), var(--green)); transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 0 8px rgba(0,255,136,0.4); will-change: width; }
   .day-card.completed .card-progress-fill { background: var(--green); }
 
-  /* SIDEBAR */
-  .sidebar {
-    position: fixed; top: 0; left: 0; width: 320px; height: 100vh;
-    background: var(--bg2); border-right: 1px solid var(--cyan-dim);
-    z-index: 2999; transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
-    overflow-y: auto; padding: 20px 20px 40px 20px; box-shadow: none;
-    will-change: transform;
+  /* TRACKER SWITCHER */
+  .tracker-toggle {
+    display: inline-flex;
+    gap: 8px;
+    margin-right: auto;
   }
-  body.sidebar-open .sidebar { transform: translateX(0); box-shadow: 10px 0 40px rgba(0,0,0,0.5); border-right-color: var(--cyan); }
+  .tracker-toggle-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .tracker-toggle-btn:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+  .tracker-toggle-btn.active {
+    border-color: var(--cyan);
+    color: #000;
+    background: var(--cyan);
+    box-shadow: 0 0 15px rgba(0,212,255,0.2);
+  }
+  .tracker-main {
+    position: relative;
+    min-height: 420px;
+  }
+  .tracker-view {
+    transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .tracker-view[hidden] {
+    display: none !important;
+  }
+  .tracker-view-active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    position: relative;
+  }
+  .tracker-view-hidden {
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+  }
+  .subject-tracker-view {
+    padding: 24px;
+    border-top: 1px solid var(--border);
+    background: rgba(13,17,23,0.5);
+    position: relative;
+    z-index: 1;
+  }
+  .subject-tracker-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    color: var(--cyan);
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
 
   .sb-subj { margin-bottom: 12px; background: var(--bg3); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); transition: border-color 0.2s ease; }
   .sb-subj:hover { border-color: var(--text-dim); }
@@ -356,6 +409,33 @@
     border-color: var(--amber);
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+  }
+  .reset-option-btn[data-reset-mode="full"] {
+    border-color: var(--red-dim);
+    background: rgba(255,68,68,0.08);
+  }
+  .reset-option-btn[data-reset-mode="full"] strong { color: var(--red); }
+  .reset-option-btn[data-reset-mode="full"]:hover {
+    border-color: var(--red);
+    box-shadow: 0 6px 16px rgba(255,68,68,0.2);
+  }
+  .reset-option-btn[data-reset-mode="progress"] {
+    border-color: var(--amber-dim);
+    background: rgba(240,165,0,0.08);
+  }
+  .reset-option-btn[data-reset-mode="progress"] strong { color: var(--amber); }
+  .reset-option-btn[data-reset-mode="progress"]:hover {
+    border-color: var(--amber);
+    box-shadow: 0 6px 16px rgba(240,165,0,0.22);
+  }
+  .reset-option-btn[data-reset-mode="swaps"] {
+    border-color: var(--cyan-dim);
+    background: rgba(0,212,255,0.08);
+  }
+  .reset-option-btn[data-reset-mode="swaps"] strong { color: var(--cyan); }
+  .reset-option-btn[data-reset-mode="swaps"]:hover {
+    border-color: var(--cyan);
+    box-shadow: 0 6px 16px rgba(0,212,255,0.2);
   }
   .reset-option-btn strong {
     display: block;
@@ -461,9 +541,6 @@
   
   /* MOBILE FIXES */
   @media (max-width: 800px) { 
-    body.sidebar-open { padding-left: 0; } 
-    .sidebar { width: 85vw; max-width: 320px; box-shadow: none; } 
-    body.sidebar-open .sidebar { box-shadow: 0 0 0 100vw rgba(0,0,0,0.75); }
     .header-top { flex-direction: column; align-items: stretch; gap: 10px; }
     .title-block { width: 100%; }
     .stats-row { width: 100%; justify-content: space-between; margin-left: 0; }
@@ -471,6 +548,9 @@
   @media (max-width: 600px) { 
     .grid-container { padding: 12px; } 
     .grid-col { min-width: 100%; } 
+    .subject-tracker-view { padding: 12px; }
+    .tracker-toggle { width: 100%; }
+    .tracker-toggle-btn { flex: 1; text-align: center; }
     .stats-row { gap: 12px; } 
     .title-block { flex-direction: column; align-items: flex-start; gap: 8px; }
     .title-block h1 { font-size: 24px; letter-spacing: 2px; }
@@ -487,7 +567,7 @@
   <div class="header-top">
     <div class="title-block">
       <div class="title-block-text">
-        <h1>HSC 2026 — 50-Day Sprint</h1>
+        <h1>HSC 2026 — Max Sprint</h1>
         <p>OPERATION: GPA 5.00 // CLEARANCE: MAXIMUM // STATUS: ACTIVE</p>
       </div>
       <div class="offline-status not-cached" id="offline-status" title="Offline cache status">
@@ -538,7 +618,10 @@
 </div>
 
 <div class="controls">
-  <button class="filter-btn" style="border-color:var(--cyan); color:var(--cyan); font-weight: bold; margin-right: auto;" onclick="toggleSidebar()">▤ SUBJECT TRACKER</button>
+  <div class="tracker-toggle">
+    <button class="tracker-toggle-btn active" data-tracker-view="days" type="button">Days Tracker</button>
+    <button class="tracker-toggle-btn" data-tracker-view="subjects" type="button">Subject Tracker</button>
+  </div>
   
   <span class="filter-label">FILTER:</span>
   <button class="filter-btn active" data-filter="ALL">All</button>
@@ -555,12 +638,14 @@
   <button class="danger-btn" id="reset-btn">RESET</button>
 </div>
 
-<div class="grid-container" id="grid"></div>
-
-<div class="sidebar" id="sidebar">
-  <button onclick="toggleSidebar()" style="position:absolute; right:16px; top:16px; background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:20px; z-index: 10; transition: color 0.2s;">✕</button>
-  <h2 style="font-family:'Barlow Condensed',sans-serif; color:var(--cyan); letter-spacing:2px; margin-bottom:20px;">SUBJECT TRACKER</h2>
-  <div id="sidebar-content"></div>
+<div class="tracker-main" id="tracker-main">
+  <div class="tracker-view tracker-view-active" id="days-tracker-view">
+    <div class="grid-container" id="grid"></div>
+  </div>
+  <div class="tracker-view tracker-view-hidden subject-tracker-view" id="subject-tracker-view" hidden>
+    <h2 class="subject-tracker-title">SUBJECT TRACKER</h2>
+    <div id="sidebar-content"></div>
+  </div>
 </div>
 
 <div class="reset-modal" id="reset-modal" aria-hidden="true">
@@ -903,19 +988,13 @@ function getSlotSubjects(dayIdx) {
 
 function getColsCount() {
   let w = window.innerWidth;
-  if (w > 800 && document.body.classList.contains('sidebar-open')) w -= 320;
   w -= 48; // padding
   let c = Math.floor((w + 16) / 296); 
   return c > 0 ? c : 1;
 }
 
-window.toggleSidebar = function() {
-  document.body.classList.toggle('sidebar-open');
-  setTimeout(() => { if(currentColsCount !== getColsCount()) renderGrid(); }, 410);
-};
-
 // ─── DOM GENERATION & GPU MASONRY ────────────────────────────────
-function buildCardInner(idx, isExpanded) {
+function buildCardInner(idx) {
   const day = SCHEDULE[idx];
   const dayNum = idx + 1;
   let slotsDone = 0;
@@ -1064,7 +1143,7 @@ function renderGrid() {
     card.style.animationDelay = `${renderCount * 0.03}s`;
     renderCount++;
 
-    card.innerHTML = buildCardInner(idx, (expandedDayIdx === idx));
+    card.innerHTML = buildCardInner(idx);
 
     // Shortest column calculation
     let shortestColIdx = 0;
@@ -1117,7 +1196,7 @@ window.toggleCard = function(idx) {
           oldCard.classList.remove('expanded');
           if (editingSlot) {
               editingSlot = null;
-              oldCard.innerHTML = buildCardInner(expandedDayIdx, false);
+              oldCard.innerHTML = buildCardInner(expandedDayIdx);
           }
       }
   }
@@ -1125,7 +1204,7 @@ window.toggleCard = function(idx) {
   if (isCurrentlyExpanded) {
       clickedCard.classList.remove('expanded');
       expandedDayIdx = null;
-      if(editingSlot) { editingSlot = null; clickedCard.innerHTML = buildCardInner(idx, false); }
+      if(editingSlot) { editingSlot = null; clickedCard.innerHTML = buildCardInner(idx); }
   } else {
       clickedCard.classList.add('expanded');
       expandedDayIdx = idx;
@@ -1218,7 +1297,7 @@ window.startSwap = function(e, slotID) {
   const card = document.getElementById(`card-${idx}`);
   
   // Soft DOM override
-  card.innerHTML = buildCardInner(idx, true);
+  card.innerHTML = buildCardInner(idx);
   
   setTimeout(() => {
     let p = parseSlot(slotOverrides[slotID] || SCHEDULE[idx][slotID.split('-')[1]]);
@@ -1245,14 +1324,14 @@ window.saveSwap = function(idx, key) {
    
    // Specific card update, not full grid
    const card = document.getElementById(`card-${idx}`);
-   if (card) card.innerHTML = buildCardInner(idx, true);
+  if (card) card.innerHTML = buildCardInner(idx);
 };
 
 window.cancelSwap = function() { 
     const idx = editingSlot.split('-')[0];
     editingSlot = null; 
     const card = document.getElementById(`card-${idx}`);
-    if (card) card.innerHTML = buildCardInner(idx, true);
+    if (card) card.innerHTML = buildCardInner(idx);
 };
 
 // ─── WINDOW RESIZE DEBOUNCE ──────────────────────────────────────
@@ -1274,8 +1353,6 @@ window.toggleAccordion = function(subj) {
 
 function renderSidebar() {
   const container = document.getElementById('sidebar-content');
-  const sidebarEl = document.getElementById('sidebar');
-  const scrollPos = sidebarEl ? sidebarEl.scrollTop : 0; 
   const phasesMap = getChapterPhasesMap();
   
   let html = '';
@@ -1320,7 +1397,61 @@ function renderSidebar() {
   });
   
   container.innerHTML = html;
-  if(sidebarEl) sidebarEl.scrollTop = scrollPos; 
+}
+
+let currentTrackerView = 'days';
+const controlsEl = document.querySelector('.controls');
+const trackerToggleButtons = document.querySelectorAll('.tracker-toggle-btn');
+let trackerSwitchTimer = null;
+
+function switchTrackerView(view) {
+  if (!['days', 'subjects'].includes(view) || view === currentTrackerView) return;
+
+  const daysView = document.getElementById('days-tracker-view');
+  const subjectView = document.getElementById('subject-tracker-view');
+  if (!daysView || !subjectView) return;
+
+  const fromView = currentTrackerView === 'days' ? daysView : subjectView;
+  const toView = view === 'days' ? daysView : subjectView;
+  if (fromView === toView) return;
+
+  if (trackerSwitchTimer) {
+    clearTimeout(trackerSwitchTimer);
+    trackerSwitchTimer = null;
+  }
+
+  if (view === 'subjects') renderSidebar();
+
+  toView.hidden = false;
+
+  fromView.classList.remove('tracker-view-active');
+  fromView.classList.add('tracker-view-hidden');
+
+  toView.classList.remove('tracker-view-hidden');
+  requestAnimationFrame(() => {
+    toView.classList.add('tracker-view-active');
+  });
+
+  trackerSwitchTimer = setTimeout(() => {
+    fromView.hidden = true;
+    trackerSwitchTimer = null;
+  }, 300);
+
+  currentTrackerView = view;
+
+  trackerToggleButtons.forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.trackerView === view);
+  });
+
+  if (controlsEl) {
+    controlsEl.classList.toggle('subject-mode', view === 'subjects');
+  }
+
+  if (view === 'days') {
+    setTimeout(() => {
+      if (currentColsCount !== getColsCount()) renderGrid();
+    }, 300);
+  }
 }
 
 // ─── EVENT LISTENERS ──────────────────────────────────────────
@@ -1332,6 +1463,12 @@ document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
     currentFilter = this.dataset.filter; 
     expandedDayIdx = null; 
     renderGrid();
+  });
+});
+
+trackerToggleButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    switchTrackerView(btn.dataset.trackerView);
   });
 });
 
@@ -1410,6 +1547,7 @@ document.getElementById('guide-toggle').addEventListener('click', function() {
 // ─── INIT ──────────────────────────────────────────────────────
 renderSidebar();
 renderGrid();
+switchTrackerView('days');
 
 // ─── OFFLINE STATUS DETECTION ──────────────────────────────────
 let offlineStatusRequestId = 0;
