@@ -200,7 +200,7 @@
   .phase-A { background: var(--day-a); color: #38bdf8; }
   .phase-B { background: var(--day-b); color: #f59e0b; }
   .phase-C { background: var(--day-c); color: #f87171; }
-  .phase-R { background: var(--day-r); color: #34d399; }
+  .phase-R1, .phase-R2, .phase-R3 { background: var(--day-r); color: #34d399; }
   .phase-BUF { background: #1a1a1a; color: #4a5568; border: 1px solid var(--text-dim); }
 
   /* CARD PROGRESS */
@@ -369,30 +369,158 @@ const CHAPTERS = {
   IT: { "1": "Ch1: ICT World & BD Context", "2": "Ch2: Data Comm & Networking", "3A": "Ch3A: Number Systems", "3B": "Ch3B: Digital Devices & Logic", "4": "Ch4: Web Design & HTML", "5": "Ch5: Programming Languages & C", "6": "Ch6: Database Management & SQL" }
 };
 
-const PHASE_DESC = { A: "Read/Input — Base understanding & class", B: "Application — Solve board CQs / exercises", C: "Extraction — MCQ drilling + Test paper", R: "Quick Review & Sweep", BUF: "Buffer Slot" };
+const PHASE_DESC = {
+  A: "Read/Input — Base understanding & class",
+  B: "Application — Solve board CQs / exercises",
+  C: "Extraction — MCQ drilling + Test paper",
+  R1: "Review Pass 1 — Quick sweep & recall",
+  R2: "Review Pass 2 — Mistake fixes & drills",
+  R3: "Review Pass 3 — Final polish",
+  BUF: "Buffer Slot"
+};
 const SUBJ_COLORS = { P1:'var(--p1)',P2:'var(--p2)',C1:'var(--c1)',C2:'var(--c2)',M1:'var(--m1)',M2:'var(--m2)',B1:'var(--b1)',B2:'var(--b2)', L1:'var(--l1)', L2:'var(--l2)', E1:'var(--e1)', E2:'var(--e2)', IT:'var(--it)' };
 const SUBJ_NAMES = { P1:'Physics 1st',P2:'Physics 2nd',C1:'Chemistry 1st',C2:'Chemistry 2nd',M1:'Higher Math 1st',M2:'Higher Math 2nd',B1:'Biology 1st',B2:'Biology 2nd', L1:'Bangla 1st', L2:'Bangla 2nd', E1:'English 1st', E2:'English 2nd', IT:'ICT' };
 
-const s1 = ["P1-10-A","P1-10-B","P1-10-C","P1-2-A","P1-2-B","P1-2-C","P1-3-A","P1-3-B","P1-3-C","P1-6-A","P1-6-B","P1-6-C","P1-8-A","P1-8-B","P1-8-C","P1-9-A","P1-9-B","P1-9-C","P1-1-A","P1-1-B","P1-1-C","P1-4-A","P1-4-B","P1-4-C","P1-5-A","P1-5-B","P1-5-C","P1-7-A","P1-7-B","M2-7-A","M2-7-B","M2-7-C","M2-8-A","M2-8-B","M2-8-C","M2-9-A","M2-9-B","M2-9-C","M2-6-A","M2-6-B","M2-6-C","M2-4-A","M2-4-B","M2-5-A","M2-5-B","M2-10-A","M2-10-B","M2-1-R","M2-2-R","M2-3-R"];
-const s2 = ["B1-8-A","B1-8-B","B1-8-C","B1-10-A","B1-10-B","B1-10-C","B1-11-A","B1-11-B","B1-11-C","B1-7-A","B1-7-B","B1-7-C","B1-9-A","B1-9-B","B1-9-C","B1-12-A","B1-12-B","B1-12-C","B1-3-A","B1-3-B","B1-4-A","B1-4-B","B1-5-A","B1-5-B","B1-6-A","B1-6-B","B1-1-R","B1-2-R","P2-6-A","P2-6-B","P2-6-C","P2-7-A","P2-7-B","P2-7-C","P2-8-A","P2-8-B","P2-8-C","P2-10-A","P2-10-B","P2-10-C","P2-11-A","P2-11-B","P2-11-C","P2-1-A","P2-1-B","P2-2-A","P2-2-B","P2-3-A","P2-3-B","BUFFER"];
-const s3 = ["P2-4-A","P2-4-B","P2-4-C","P2-9-A","P2-9-B","P2-9-C","P2-5-A","P2-5-B","P2-5-C","M1-5-A","M1-5-B","M1-5-C","M1-6-A","M1-6-B","M1-6-C","M1-8-A","M1-8-B","M1-8-C","M1-7-A","M1-7-B","M1-9-A","M1-9-B","M1-10-A","M1-10-B","M1-1-R","M1-2-R","M1-3-R","M1-4-R","C1-3-A","C1-3-B","C1-3-C","C1-1-A","C1-1-B","C1-1-C","C1-5-A","C1-5-B","C1-5-C","C2-3-A","C2-3-B","C2-3-C","C2-1-A","C2-1-B","C2-4-A","C2-4-B","C2-2-A","C2-2-B","C2-2-C","C2-5-A","C2-5-B","C2-5-C"];
-const s4 = ["C1-2-A","C1-2-B","C1-4-A","C1-4-B","B2-2.1-A","B2-2.1-B","B2-2.1-C","B2-11-A","B2-11-B","B2-11-C","B2-1-A","B2-1-B","B2-1-C","B2-2.2-A","B2-2.2-B","B2-2.2-C","B2-2.3-A","B2-2.3-B","B2-2.3-C","B2-3-A","B2-3-B","B2-3-C","B2-5-A","B2-5-B","B2-5-C","B2-6-A","B2-6-B","B2-6-C","B2-10-A","B2-10-B","B2-10-C","B2-12-A","B2-12-B","B2-12-C","B2-4-A","B2-4-B","B2-7-A","B2-7-B","B2-8-A","B2-8-B","B2-9-A","B2-9-B","BUFFER","BUFFER","BUFFER","BUFFER","BUFFER","BUFFER","BUFFER","BUFFER"];
+const s1 = ["P1-10-A","P1-10-B","P1-10-C","P1-2-A","P1-2-B","P1-2-C","P1-3-A","P1-3-B","P1-3-C","P1-6-A","P1-6-B","P1-6-C","P1-8-A","P1-8-B","P1-8-C","P1-9-A","P1-9-B","P1-9-C","P1-1-A","P1-1-B","P1-1-C","P1-4-A","P1-4-B","P1-4-C","P1-5-A","P1-5-B","P1-5-C","P1-7-A","P1-7-B","M2-7-A","M2-7-B","M2-7-C","M2-8-A","M2-8-B","M2-8-C","M2-9-A","M2-9-B","M2-9-C","M2-6-A","M2-6-B","M2-6-C","M2-4-A","M2-4-B","M2-5-A","M2-5-B","M2-10-A","M2-10-B","M2-1-R1","M2-2-R2","M2-3-R3"];
+const s2 = ["B1-8-A","B1-8-B","B1-8-C","B1-10-A","B1-10-B","B1-10-C","B1-11-A","B1-11-B","B1-11-C","B1-7-A","B1-7-B","B1-7-C","B1-9-A","B1-9-B","B1-9-C","B1-3-A","B1-3-B","B1-4-A","B1-4-B","B1-12-A","B1-12-B","B1-12-C","B1-5-A","B1-5-B","B1-6-A","B1-6-B","B1-1-R1","B1-2-R2","P2-6-A","P2-6-B","P2-6-C","P2-7-A","P2-7-B","P2-7-C","P2-8-A","P2-8-B","P2-8-C","P2-10-A","P2-10-B","P2-10-C","P2-11-A","P2-11-B","P2-11-C","P2-1-A","P2-1-B","P2-2-A","P2-2-B","P2-3-A","P2-3-B","BUFFER"];
+const s3 = ["P2-4-A","P2-4-B","P2-4-C","P2-9-A","P2-9-B","P2-9-C","P2-5-A","P2-5-B","P2-5-C","M1-5-A","M1-5-B","M1-5-C","M1-6-A","M1-6-B","M1-6-C","M1-8-A","M1-8-B","M1-8-C","M1-7-A","M1-7-B","M1-9-A","M1-9-B","M1-10-A","M1-10-B","M1-1-R1","M1-2-R2","M1-3-R3","M1-4-R1","C1-3-A","C1-3-B","C1-3-C","C1-1-A","C1-1-B","C1-1-C","C1-5-A","C1-5-B","C1-5-C","C2-3-A","C2-3-B","C2-3-C","C2-1-A","C2-1-B","C2-4-A","C2-4-B","C2-2-A","C2-2-B","C2-2-C","C2-5-A","C2-5-B","C2-5-C"];
+const s4 = ["C1-2-A","C1-2-B","C1-4-A","C1-4-B","B2-2.1-A","B2-2.1-B","B2-2.1-C","B2-11-A","B2-11-B","B2-11-C","B2-1-A","B2-1-B","B2-1-C","B2-2.2-A","B2-2.2-B","B2-2.2-C","B2-2.3-A","B2-2.3-B","B2-2.3-C","B2-3-A","B2-3-B","B2-3-C","B2-5-A","B2-5-B","B2-5-C","B2-4-A","B2-4-B","B2-6-A","B2-6-B","B2-6-C","B2-10-A","B2-10-B","B2-10-C","B2-12-A","B2-12-B","B2-12-C","B2-7-A","B2-7-B","B2-8-A","B2-8-B","B2-9-A","B2-9-B","BUFFER","BUFFER","BUFFER","BUFFER","BUFFER","BUFFER","BUFFER","BUFFER"];
 
-const it_t = ["IT-1-A","IT-2-A","IT-3A-A","IT-3A-B","IT-3B-A","IT-3B-B","IT-4-A","IT-4-B","IT-5-A","IT-6-A"];
-const e2_t = ["E2-G1-A","E2-G3-A","E2-G4-A","E2-G5-A","E2-G6-A","E2-G7-A","E2-G9-A","E2-G10-A","E2-W14-A","E2-W16-A"];
-const l2_t = ["L2-G1-A","L2-G2-A","L2-G3-A","L2-G4-A","L2-G5-A","L2-G6-A","L2-C7-A","L2-C8-A","L2-C10-A","L2-C12-A"];
-const e1_t = ["E1-R1-A","E1-R2-A","E1-R4-A","E1-R5-A","E1-R6-A","E1-W7-A","E1-W8-A","E1-W10-A","E1-W11-A","E1-R3-A"];
-const l1_t = ["L1-P1-A","L1-P2-A","L1-K2-A","L1-K3-A","L1-K4-A","L1-N1-A","L1-N1-B","L1-N2-A","L1-N2-B","L1-P4-A"];
-const s6 = [];
-for(let i=0; i<10; i++){ s6.push(it_t[i], e2_t[i], l2_t[i], e1_t[i], l1_t[i]); }
+const it_t = [
+  "IT-1-A","IT-1-B","IT-2-A","IT-2-B",
+  "IT-3A-A","IT-3A-B","IT-3B-A","IT-3B-B",
+  "IT-4-A","IT-4-B","IT-5-A","IT-5-B","IT-6-A","IT-6-B"
+];
+const e2_t = [
+  "E2-G1-A","E2-G1-B","E2-G2-A","E2-G2-B","E2-G3-A","E2-G3-B",
+  "E2-G4-A","E2-G4-B","E2-G5-A","E2-G5-B","E2-G6-A","E2-G6-B",
+  "E2-G7-A","E2-G7-B","E2-G8-A","E2-G8-B","E2-G9-A","E2-G9-B",
+  "E2-G10-A","E2-G10-B","E2-G11-A","E2-G11-B","E2-G12-A","E2-G12-B",
+  "E2-W13-A","E2-W13-B","E2-W14-A","E2-W14-B","E2-W15-A","E2-W15-B",
+  "E2-W16-A","E2-W16-B"
+];
+const l2_t = [
+  "L2-G1-A","L2-G1-B","L2-G2-A","L2-G2-B","L2-G3-A","L2-G3-B",
+  "L2-G4-A","L2-G4-B","L2-G5-A","L2-G5-B","L2-G6-A","L2-G6-B",
+  "L2-C7-A","L2-C7-B","L2-C8-A","L2-C8-B","L2-C9-A","L2-C9-B",
+  "L2-C10-A","L2-C10-B","L2-C11-A","L2-C11-B","L2-C12-A","L2-C12-B"
+];
+const e1_t = [
+  "E1-R1-A","E1-R1-B","E1-R2-A","E1-R2-B","E1-R3-A","E1-R3-B",
+  "E1-R4-A","E1-R4-B","E1-R5-A","E1-R5-B","E1-R6-A","E1-R6-B",
+  "E1-W7-A","E1-W7-B","E1-W8-A","E1-W8-B","E1-W9-A","E1-W9-B",
+  "E1-W10-A","E1-W10-B","E1-W11-A","E1-W11-B"
+];
+const l1_prose = [
+  "L1-P1-A","L1-P1-B","L1-P2-A","L1-P2-B","L1-P3-A","L1-P3-B",
+  "L1-P4-A","L1-P4-B","L1-P5-A","L1-P5-B","L1-P6-A","L1-P6-B",
+  "L1-P7-A","L1-P7-B","L1-P8-A","L1-P8-B","L1-P9-A","L1-P9-B",
+  "L1-P10-A","L1-P10-B","L1-P11-A","L1-P11-B","L1-P12-A","L1-P12-B"
+];
+const l1_poem = [
+  "L1-K1-A","L1-K1-B","L1-K2-A","L1-K2-B","L1-K3-A","L1-K3-B",
+  "L1-K4-A","L1-K4-B","L1-K5-A","L1-K5-B","L1-K6-A","L1-K6-B",
+  "L1-K7-A","L1-K7-B","L1-K8-A","L1-K8-B","L1-K9-A","L1-K9-B",
+  "L1-K10-A","L1-K10-B","L1-K11-A","L1-K11-B","L1-K12-A","L1-K12-B"
+];
+const l1_novel = ["L1-N1-A","L1-N1-B","L1-N2-A","L1-N2-B"];
+
+function buildL1Mixed() {
+  const mixed = [];
+  let p = 0, k = 0, n = 0;
+  while(p < l1_prose.length || k < l1_poem.length || n < l1_novel.length) {
+    if(p < l1_prose.length) mixed.push(l1_prose[p++]);
+    if(k < l1_poem.length) mixed.push(l1_poem[k++]);
+    if(p < l1_prose.length) mixed.push(l1_prose[p++]);
+    if(n < l1_novel.length) mixed.push(l1_novel[n++]);
+    if(k < l1_poem.length) mixed.push(l1_poem[k++]);
+  }
+  return mixed;
+}
+
+function nextItem(subjectKey, subjectLists, indices, lastItem) {
+  const list = subjectLists[subjectKey] || [];
+  if(list.length === 0) return "BUFFER";
+  let idx = indices[subjectKey] % list.length;
+  let item = list[idx];
+  indices[subjectKey] = idx + 1;
+  if(item === lastItem && list.length > 1) {
+    item = list[indices[subjectKey] % list.length];
+    indices[subjectKey] += 1;
+  }
+  return item;
+}
+
+function buildLangSlots(totalDays) {
+  const l1_t = buildL1Mixed();
+  const subjectLists = { L1: l1_t, L2: l2_t, E1: e1_t, E2: e2_t, IT: it_t };
+  const indices = { L1: 0, L2: 0, E1: 0, E2: 0, IT: 0 };
+  const subjectCycle = ["L1","L2","L1","E1","E2"];
+  let cycleIndex = 0;
+  let lastItem = null;
+  let lastSubject = null;
+  const s5 = [];
+  const s6 = [];
+  const s4Extra = {};
+
+  const pickSubject = (forceSubject) => {
+    if(forceSubject) return forceSubject;
+    let subject;
+    let tries = 0;
+    do {
+      subject = subjectCycle[cycleIndex % subjectCycle.length];
+      cycleIndex++;
+      tries++;
+    } while(subject === lastSubject && tries <= subjectCycle.length);
+    return subject;
+  };
+
+  for(let day = 0; day < totalDays; day++) {
+    const daySlots = [];
+    for(let slot = 0; slot < 3; slot++) {
+      const forceIT = (slot === 2 && day % 2 === 0) ? "IT" : null;
+      const subject = pickSubject(forceIT);
+      const item = nextItem(subject, subjectLists, indices, lastItem);
+      daySlots.push(item);
+      lastItem = item;
+      lastSubject = subject;
+    }
+    s5.push([daySlots[0], daySlots[1]]);
+    s6.push(daySlots[2]);
+  }
+
+  for(let day = 42; day < 50; day++) {
+    const subject = pickSubject();
+    const item = nextItem(subject, subjectLists, indices, lastItem);
+    s4Extra[day] = item;
+    lastItem = item;
+    lastSubject = subject;
+  }
+
+  return { s5, s6, s4Extra };
+}
+
+const langSlots = buildLangSlots(50);
+const s5 = langSlots.s5;
+const s6 = langSlots.s6;
+const s4Extra = langSlots.s4Extra;
 
 const SCHEDULE = [];
 for(let i=0; i<50; i++) {
-  SCHEDULE.push({ s1: s1[i], s2: s2[i], s3: s3[i], s4: s4[i], s5: "BUFFER", s6: s6[i] });
+  let s4Val = s4[i] || "BUFFER";
+  if(s4Extra[i] && s4Val === "BUFFER") s4Val = s4Extra[i];
+  SCHEDULE.push({
+    s1: s1[i] || "BUFFER",
+    s2: s2[i] || "BUFFER",
+    s3: s3[i] || "BUFFER",
+    s4: s4Val,
+    s5: s5[i] || "BUFFER",
+    s6: s6[i] || "BUFFER"
+  });
 }
 
 function parseSlot(s) {
-  if(s === "BUFFER") return {subj:null, ch:null, phase:"BUF", label:"BUFFER"};
+  if(!s || s === "BUFFER") return {subj:null, ch:null, phase:"BUF", label:"BUFFER"};
   const lastDash = s.lastIndexOf("-");
   const firstDash = s.indexOf("-");
   if(firstDash === -1 || lastDash === firstDash) return {subj:null, ch:null, phase:"BUF", label:"ERR"};
@@ -402,9 +530,41 @@ function parseSlot(s) {
   return {subj, ch, phase};
 }
 
+function normalizeSlotItems(slotData) {
+  if(Array.isArray(slotData)) return slotData;
+  return [slotData];
+}
+
 function getChName(subj, ch) { return (!subj || !CHAPTERS[subj]) ? "" : (CHAPTERS[subj][ch] || ch); }
 function getPhaseClass(phase) { return "phase-" + phase; }
 function getSubjColor(subj) { return SUBJ_COLORS[subj] || "var(--text-dim)"; }
+
+function getChapterPhasesMap() {
+  const phasesMap = {};
+  Object.keys(CHAPTERS).forEach(subj => {
+    phasesMap[subj] = {};
+    Object.keys(CHAPTERS[subj]).forEach(ch => {
+      phasesMap[subj][ch] = new Set();
+    });
+  });
+
+  for(let i=0; i<50; i++) {
+    ['s1','s2','s3','s4','s5','s6'].forEach(key => {
+      const slotID = `${i}-${key}`;
+      const slotData = slotOverrides[slotID] || SCHEDULE[i][key];
+      normalizeSlotItems(slotData).forEach(item => {
+        if(item === 'BUFFER') return;
+        const p = parseSlot(item);
+        if(!p.subj || !p.ch || !p.phase || p.phase === 'BUF') return;
+        if(phasesMap[p.subj] && phasesMap[p.subj][p.ch]) {
+          phasesMap[p.subj][p.ch].add(p.phase);
+        }
+      });
+    });
+  }
+
+  return phasesMap;
+}
 
 // ─── STATE MANAGEMENT ──────────────────────────────────────────
 let chapterProgress = JSON.parse(localStorage.getItem('hsc_chapter_prog') || '{}');
@@ -416,10 +576,26 @@ let expandedDayIdx = null;
 let editingSlot = null;
 let openAccordions = []; 
 
+Object.keys(slotOverrides).forEach(key => {
+  const val = slotOverrides[key];
+  if(typeof val === 'string' && val.endsWith('-R')) {
+    slotOverrides[key] = `${val.slice(0, -2)}-R1`;
+  }
+});
+
 Object.keys(CHAPTERS).forEach(subj => {
   if(!chapterProgress[subj]) chapterProgress[subj] = {};
   Object.keys(CHAPTERS[subj]).forEach(ch => {
-    if(!chapterProgress[subj][ch]) chapterProgress[subj][ch] = {A:false, B:false, C:false};
+    if(!chapterProgress[subj][ch]) {
+      chapterProgress[subj][ch] = {A:false, B:false, C:false, R1:false, R2:false, R3:false};
+    } else {
+      if(chapterProgress[subj][ch].R1 === undefined) chapterProgress[subj][ch].R1 = false;
+      if(chapterProgress[subj][ch].R2 === undefined) chapterProgress[subj][ch].R2 = false;
+      if(chapterProgress[subj][ch].R3 === undefined) chapterProgress[subj][ch].R3 = false;
+      if(chapterProgress[subj][ch].R !== undefined && chapterProgress[subj][ch].R1 === false) {
+        chapterProgress[subj][ch].R1 = chapterProgress[subj][ch].R === true;
+      }
+    }
   });
 });
 
@@ -430,10 +606,10 @@ function saveState() {
 }
 
 function getSlotSubjects(dayIdx) {
-  return ['s1','s2','s3','s4','s5','s6'].map(k => {
+  return ['s1','s2','s3','s4','s5','s6'].flatMap(k => {
      let data = slotOverrides[`${dayIdx}-${k}`] || SCHEDULE[dayIdx][k];
-     return parseSlot(data).subj;
-  }).filter(Boolean);
+     return normalizeSlotItems(data).map(item => parseSlot(item).subj).filter(Boolean);
+  });
 }
 
 function getColsCount() {
@@ -467,7 +643,10 @@ function buildCardInner(idx, isExpanded) {
     let slotID = `${idx}-${key}`;
     let isChecked = slotProgress[slotID];
     let slotData = slotOverrides[slotID] || day[key];
-    const p = parseSlot(slotData);
+    const slotItems = normalizeSlotItems(slotData);
+    const parsedItems = slotItems.map(item => parseSlot(item));
+    const p = parsedItems[0];
+    const isMulti = parsedItems.length > 1 && p.phase !== "BUF";
     
     let tickIcon = isChecked ? '<span style="color:var(--green)">✔</span>' : '<span style="color:var(--text-dim)">○</span>';
     
@@ -475,10 +654,16 @@ function buildCardInner(idx, isExpanded) {
     if(p.phase === "BUF") {
       summaryHTML += `<div class="slot-row"><span class="slot-tick" data-key="${key}">${tickIcon}</span> <span class="slot-num">${slotLabels[si]}</span><span class="slot-chip phase-BUF">BUF</span><span class="slot-desc" style="color:var(--text-dim)">BUFFER SLOT</span></div>`;
     } else {
-      const rawChName = getChName(p.subj, p.ch).split(" | ")[0];
-      const isLang = ['L1','L2','E1','E2','IT'].includes(p.subj);
-      const chPrefix = isLang ? '' : `Ch${p.ch} — `;
-      summaryHTML += `<div class="slot-row"><span class="slot-tick" data-key="${key}">${tickIcon}</span> <span class="slot-num">${slotLabels[si]}</span><span class="slot-chip ${getPhaseClass(p.phase)}">${p.phase}</span><span class="slot-desc" style="color:${getSubjColor(p.subj)}">${p.subj} ${chPrefix}${rawChName}</span></div>`;
+      const phaseLabel = parsedItems.map(item => item.phase).join('+');
+      const descParts = parsedItems.map(item => {
+        const rawChName = getChName(item.subj, item.ch).split(" | ")[0];
+        const isLang = ['L1','L2','E1','E2','IT'].includes(item.subj);
+        const chPrefix = isLang ? '' : `Ch${item.ch} — `;
+        return `${item.subj} ${chPrefix}${rawChName}`;
+      });
+      const descHtml = isMulti ? descParts.join(" / ") : descParts[0];
+      const descStyle = isMulti ? `color:${getSubjColor(p.subj)};white-space:normal` : `color:${getSubjColor(p.subj)}`;
+      summaryHTML += `<div class="slot-row"><span class="slot-tick" data-key="${key}">${tickIcon}</span> <span class="slot-num">${slotLabels[si]}</span><span class="slot-chip ${getPhaseClass(p.phase)}">${phaseLabel}</span><span class="slot-desc" style="${descStyle}">${descHtml}</span></div>`;
     }
 
     // EXPANDED VIEW
@@ -492,7 +677,10 @@ function buildCardInner(idx, isExpanded) {
               <select class="swap-select" id="swap-ch-${slotID}" style="${p.phase==='BUF'?'display:none;':''}"><option value="${p.ch}">${p.ch}</option></select>
               <select class="swap-select" id="swap-ph-${slotID}" style="${p.phase==='BUF'?'display:none;':''}">
                 <option value="A" ${p.phase==='A'?'selected':''}>A</option><option value="B" ${p.phase==='B'?'selected':''}>B</option>
-                <option value="C" ${p.phase==='C'?'selected':''}>C</option><option value="R" ${p.phase==='R'?'selected':''}>R</option>
+                <option value="C" ${p.phase==='C'?'selected':''}>C</option>
+                <option value="R1" ${p.phase==='R1'?'selected':''}>R1</option>
+                <option value="R2" ${p.phase==='R2'?'selected':''}>R2</option>
+                <option value="R3" ${p.phase==='R3'?'selected':''}>R3</option>
               </select>
             </div>
             <div style="display:flex; justify-content:flex-end; width:100%; gap:8px; margin-top:4px;">
@@ -517,16 +705,22 @@ function buildCardInner(idx, isExpanded) {
         const isLang = ['L1','L2','E1','E2','IT'].includes(p.subj);
         const rawChName = getChName(p.subj, p.ch);
         const chPrefix = isLang ? '' : `Ch${p.ch}`;
+        const phaseLabel = parsedItems.map(item => item.phase).join('+');
+        const extraLines = parsedItems.slice(1).map(item => {
+          const raw = getChName(item.subj, item.ch);
+          return `<div class="detail-desc" style="color:${getSubjColor(item.subj)};opacity:0.8;margin-bottom:4px">${raw}</div>`;
+        }).join('');
         detailHTML += `
           <div class="detail-slot ${isChecked?'done':''}">
             <input type="checkbox" class="slot-check" data-id="${slotID}" ${isChecked?'checked':''}>
             <div class="detail-content">
               <div class="detail-title" style="color:${color}">${SUBJ_NAMES[p.subj] || p.subj} — ${chPrefix}</div>
               <div class="detail-desc" style="color:${color};opacity:0.8;margin-bottom:4px">${rawChName}</div>
+              ${extraLines}
               <div class="detail-desc">${PHASE_DESC[p.phase] || 'Custom Task'}</div>
             </div>
-            <div class="detail-badge ${getPhaseClass(p.phase)}">${p.phase === 'R' ? 'REV' : 'PH '+p.phase}</div>
-            <button class="swap-btn" onclick="startSwap(event, '${slotID}')">⚙ Swap</button>
+            <div class="detail-badge ${getPhaseClass(p.phase)}">${phaseLabel.startsWith('R') ? phaseLabel : 'PH '+phaseLabel}</div>
+            ${isMulti ? '' : `<button class="swap-btn" onclick="startSwap(event, '${slotID}')">⚙ Swap</button>`}
           </div>`;
       }
     }
@@ -662,13 +856,15 @@ document.getElementById('grid').addEventListener('change', function(e) {
        let [idx, key] = slotID.split('-');
        let slotData = slotOverrides[slotID] || SCHEDULE[idx][key];
        
-       if(slotData !== 'BUFFER') {
-          let p = parseSlot(slotData);
-          if (['A','B','C'].includes(p.phase)) {
-             if(!chapterProgress[p.subj][p.ch]) chapterProgress[p.subj][p.ch] = {A:false,B:false,C:false};
+       normalizeSlotItems(slotData).forEach(item => {
+         if(item !== 'BUFFER') {
+           let p = parseSlot(item);
+           if (['A','B','C','R1','R2','R3'].includes(p.phase)) {
+             if(!chapterProgress[p.subj][p.ch]) chapterProgress[p.subj][p.ch] = {A:false,B:false,C:false,R1:false,R2:false,R3:false};
              chapterProgress[p.subj][p.ch][p.phase] = isChecked;
-          }
-       }
+           }
+         }
+       });
        saveState();
        
        // Instant Local Update
@@ -708,23 +904,28 @@ window.toggleSidebarPhase = function(subj, ch, phase, isChecked) {
    for(let i=0; i<50; i++){
       ['s1','s2','s3','s4','s5','s6'].forEach(key => {
          let slotID = `${i}-${key}`, slotData = slotOverrides[slotID] || SCHEDULE[i][key];
-         if(slotData !== 'BUFFER') {
-            let p = parseSlot(slotData);
-            if(p.subj === subj && String(p.ch) === String(ch) && p.phase === phase) {
-                slotProgress[slotID] = isChecked;
-            }
-         }
+      normalizeSlotItems(slotData).forEach(item => {
+        if(item !== 'BUFFER') {
+          let p = parseSlot(item);
+          if(p.subj === subj && String(p.ch) === String(ch) && p.phase === phase) {
+            slotProgress[slotID] = isChecked;
+          }
+        }
+      });
       });
    }
    saveState();
+  renderSidebar();
    renderGrid();
 };
 
 // ─── SWAP LOGIC ──────────────────────────────────────────────────
 window.startSwap = function(e, slotID) {
   e.stopPropagation();
-  editingSlot = slotID;
   const idx = slotID.split('-')[0];
+  const slotData = slotOverrides[slotID] || SCHEDULE[idx][slotID.split('-')[1]];
+  if(Array.isArray(slotData) && slotData.length > 1) return;
+  editingSlot = slotID;
   const card = document.getElementById(`card-${idx}`);
   
   // Soft DOM override
@@ -786,6 +987,7 @@ function renderSidebar() {
   const container = document.getElementById('sidebar-content');
   const sidebarEl = document.getElementById('sidebar');
   const scrollPos = sidebarEl ? sidebarEl.scrollTop : 0; 
+  const phasesMap = getChapterPhasesMap();
   
   let html = '';
   Object.keys(CHAPTERS).forEach(subj => {
@@ -797,12 +999,15 @@ function renderSidebar() {
     Object.keys(CHAPTERS[subj]).forEach(ch => {
       const chTitle = CHAPTERS[subj][ch];
       const prog = chapterProgress[subj][ch];
+      const phaseSet = phasesMap[subj]?.[ch] || new Set();
+      let phases = ['A','B','C','R1','R2','R3'].filter(phase => phaseSet.has(phase));
+      if(phases.length === 0) phases = ['A'];
       
-      let tickHTML = ['A', 'B', 'C'].map(phase => {
-        subjTotal++;
-        if(prog[phase]) subjDone++;
-        return `<label class="tick-label"><input type="checkbox" ${prog[phase]?'checked':''} onchange="toggleSidebarPhase('${subj}', '${ch}', '${phase}', this.checked)"><span>${phase}</span></label>`;
-      }).join('');
+      let tickHTML = phases.map(phase => {
+          subjTotal++;
+          if(prog[phase]) subjDone++;
+          return `<label class="tick-label"><input type="checkbox" ${prog[phase]?'checked':''} onchange="toggleSidebarPhase('${subj}', '${ch}', '${phase}', this.checked)"><span>${phase}</span></label>`;
+        }).join('');
       
       chHTML += `
         <div class="sb-ch">
@@ -843,7 +1048,7 @@ document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
 
 document.getElementById('reset-btn').addEventListener('click', () => {
   if(confirm('Reset all tracking, progress, and custom swaps? This cannot be undone.')) {
-    chapterProgress = {}; Object.keys(CHAPTERS).forEach(s => { chapterProgress[s] = {}; Object.keys(CHAPTERS[s]).forEach(c => chapterProgress[s][c] = {A:false, B:false, C:false}); });
+    chapterProgress = {}; Object.keys(CHAPTERS).forEach(s => { chapterProgress[s] = {}; Object.keys(CHAPTERS[s]).forEach(c => chapterProgress[s][c] = {A:false, B:false, C:false, R1:false, R2:false, R3:false}); });
     slotProgress = {}; slotOverrides = {}; expandedDayIdx = null; saveState(); renderGrid(); renderSidebar();
   }
 });
