@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080b10">
 <title>HSC 2026 — Max Sprint</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Share+Tech+Mono&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -82,19 +84,54 @@
   .title-block h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; color: var(--amber); text-shadow: 0 0 24px rgba(240,165,0,0.5); line-height: 1; margin: 0; }
   .title-block p { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 2px; margin-top: 4px; margin-bottom: 0; }
   
-  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 10px; width: 100%; margin-top: 14px; }
+  .stats-row { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 14px; }
   .stat { text-align: left; padding: 12px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 8px 24px rgba(0,0,0,0.18); }
   .stat-val { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; color: var(--cyan); line-height: 1; text-shadow: 0 0 18px rgba(0,212,255,0.4); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); transform: translateZ(0); letter-spacing: 1px; }
   .stat:hover .stat-val { transform: scale(1.08) translateZ(0); }
   .stat-label { font-family: 'Share Tech Mono', monospace; font-size: 8px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; font-weight: 700; line-height: 1.25; }
-  .global-stat { grid-column: 1 / -1; border-color: rgba(0,212,255,0.25); background: linear-gradient(135deg, rgba(0,212,255,0.08) 0%, rgba(255,255,255,0.03) 100%); }
+  .global-stat { border-color: rgba(0,212,255,0.25); background: linear-gradient(135deg, rgba(0,212,255,0.08) 0%, rgba(255,255,255,0.03) 100%); }
   .global-stat .stat-val { font-size: 26px; color: var(--amber); text-shadow: 0 0 18px rgba(240,165,0,0.45), 0 0 18px rgba(0,212,255,0.3); }
+  .stats-collapse-btn {
+    align-self: flex-start;
+    padding: 6px 12px;
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    color: var(--text-dim);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .stats-collapse-btn:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
+    background: rgba(0,212,255,0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(0,212,255,0.25);
+  }
+  .subject-stats-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+    gap: 10px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+  }
+  .subject-stats-list.open {
+    max-height: 520px;
+    opacity: 1;
+  }
 
   .progress-wrap { width: 100%; transform: translateZ(0); }
   .progress-bar-bg { height: 12px; background: rgba(0,212,255,0.08); border-radius: 8px; overflow: hidden; position: relative; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5), 0 0 12px rgba(0,212,255,0.2); border: 1px solid var(--glass-border); }
   .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--cyan-dim), var(--cyan), #00ffff); border-radius: 8px; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1); position: relative; box-shadow: 0 0 24px rgba(0,212,255,0.9), inset 0 0 12px rgba(255,255,255,0.2), 0 0 40px rgba(0,212,255,0.6); will-change: width; }
   .progress-bar-fill::after { content: ''; position: absolute; right: 0; top: -2px; width: 14px; height: 14px; background: radial-gradient(circle, #fff, rgba(255,255,255,0.7)); border-radius: 50%; box-shadow: 0 0 16px rgba(255,255,255,0.9), 0 0 28px rgba(0,212,255,0.8); filter: drop-shadow(0 0 6px rgba(0,212,255,0.7)); }
-  .progress-text { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text-dim); margin-top: 6px; letter-spacing: 1px; }
+  .progress-text { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 800; color: var(--text-bright); margin-top: 8px; letter-spacing: 1.4px; text-transform: uppercase; text-shadow: 0 0 10px rgba(0,212,255,0.35); }
 
   /* CONTROLS */
   .controls { padding: 16px 24px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; border-bottom: 1px solid rgba(0,212,255,0.1); position: relative; z-index: 1; background: linear-gradient(180deg, rgba(13,17,23,0.5) 0%, rgba(8,11,16,0.3) 100%); }
@@ -645,7 +682,7 @@
     <div class="progress-bar-bg">
       <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
     </div>
-    <div class="progress-text" id="progress-text">0 / 0 chapters completed</div>
+    <div class="progress-text" id="progress-text">You are 0% there</div>
   </div>
 </header>
 
@@ -939,7 +976,7 @@ function isChapterComplete(subj, ch, phasesMap) {
 
 function getChapterProgressCounts(subj, ch, phases) {
   const prog = chapterProgress[subj] && chapterProgress[subj][ch];
-  const phaseList = (phases && phases.length) ? phases : ['A', 'B', 'C', 'R1', 'R2', 'R3'];
+  const phaseList = (phases && phases.length) ? phases : ['A', 'B', 'C'];
   let done = 0;
 
   phaseList.forEach(phase => {
@@ -947,6 +984,13 @@ function getChapterProgressCounts(subj, ch, phases) {
   });
 
   return { done, total: phaseList.length, complete: done === phaseList.length };
+}
+
+function formatProgressValue(value) {
+  if (!Number.isFinite(value)) return '0';
+  const rounded = Math.round(value * 100) / 100;
+  if (Number.isInteger(rounded)) return String(rounded);
+  return rounded.toFixed(2).replace(/0$/, '');
 }
 
 function ensureSubjectStatsUI() {
@@ -961,16 +1005,35 @@ function ensureSubjectStatsUI() {
   globalCard.innerHTML = '<div class="stat-val" id="stat-global-val">0/0</div><div class="stat-label">All subjects completed</div>';
   frag.appendChild(globalCard);
 
+  const toggleBtn = document.createElement('button');
+  toggleBtn.type = 'button';
+  toggleBtn.className = 'stats-collapse-btn';
+  toggleBtn.id = 'subject-stats-toggle';
+  toggleBtn.setAttribute('aria-expanded', 'false');
+  toggleBtn.textContent = `Show subjects (${SUBJECT_ORDER.length})`;
+  frag.appendChild(toggleBtn);
+
+  const subjectList = document.createElement('div');
+  subjectList.className = 'subject-stats-list';
+  subjectList.id = 'subject-stats-list';
+
   SUBJECT_ORDER.forEach(subj => {
     const card = document.createElement('div');
     card.className = 'stat subject-stat';
     card.id = `stat-${subj}`;
     card.innerHTML = `<div class="stat-val" id="stat-${subj}-val">0/0</div><div class="stat-label">${SUBJ_NAMES[subj] || subj} completed</div>`;
     card.querySelector('.stat-val').style.color = getSubjColor(subj);
-    frag.appendChild(card);
+    subjectList.appendChild(card);
   });
 
+  frag.appendChild(subjectList);
+
   container.appendChild(frag);
+  toggleBtn.addEventListener('click', () => {
+    const isOpen = subjectList.classList.toggle('open');
+    toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    toggleBtn.textContent = isOpen ? `Hide subjects (${SUBJECT_ORDER.length})` : `Show subjects (${SUBJECT_ORDER.length})`;
+  });
   container.dataset.built = '1';
 }
 
@@ -1283,20 +1346,25 @@ function updateGlobalStats() {
     let done = 0;
 
     chapters.forEach(ch => {
-      if (isChapterComplete(subj, ch, phasesMap)) done++;
+      const availablePhases = phasesMap?.[subj]?.[ch]
+        ? ['A', 'B', 'C', 'R1', 'R2', 'R3'].filter(phase => phasesMap[subj][ch].has(phase))
+        : ['A', 'B', 'C'];
+      const chapterCounts = getChapterProgressCounts(subj, ch, availablePhases.length ? availablePhases : ['A']);
+      const chapterFraction = chapterCounts.total ? (chapterCounts.done / chapterCounts.total) : 0;
+      done += chapterFraction;
     });
 
     globalDone += done;
 
     const valueEl = document.getElementById(`stat-${subj}-val`);
-    if (valueEl) valueEl.textContent = `${done}/${total}`;
+    if (valueEl) valueEl.textContent = `${formatProgressValue(done)}/${total}`;
   });
 
   const pct = GLOBAL_TOTAL_CHAPTERS ? Math.round((globalDone / GLOBAL_TOTAL_CHAPTERS) * 100) : 0;
   const globalVal = document.getElementById('stat-global-val');
-  if (globalVal) globalVal.textContent = `${globalDone}/${GLOBAL_TOTAL_CHAPTERS}`;
+  if (globalVal) globalVal.textContent = `${formatProgressValue(globalDone)}/${GLOBAL_TOTAL_CHAPTERS}`;
   document.getElementById('progress-fill').style.width = pct + '%';
-  document.getElementById('progress-text').textContent = `${globalDone} / ${GLOBAL_TOTAL_CHAPTERS} chapters completed`;
+  document.getElementById('progress-text').textContent = `You are ${pct}% there`;
 }
 
 // ─── INTERACTION LOGIC (ZERO REBUILDS) ───────────────────────────
@@ -1475,7 +1543,8 @@ function renderSidebar() {
   Object.keys(CHAPTERS).forEach(subj => {
     const subjName = SUBJ_NAMES[subj] || subj;
     const subjColor = SUBJ_COLORS[subj] || 'var(--amber)';
-    let subjTotal = 0, subjDone = 0;
+    const totalChapters = Object.keys(CHAPTERS[subj]).length;
+    let progressedChapters = 0;
     
     let chHTML = '';
     Object.keys(CHAPTERS[subj]).forEach(ch => {
@@ -1487,10 +1556,10 @@ function renderSidebar() {
 
       const chapterCounts = getChapterProgressCounts(subj, ch, phases);
       const chapterComplete = chapterCounts.complete;
+      const chapterFraction = chapterCounts.total ? (chapterCounts.done / chapterCounts.total) : 0;
+      progressedChapters += chapterFraction;
       
       let tickHTML = phases.map(phase => {
-          subjTotal++;
-          if(prog[phase]) subjDone++;
           return `<label class="tick-label"><input type="checkbox" ${prog[phase]?'checked':''} onchange="toggleSidebarPhase('${subj}', '${ch}', '${phase}', this.checked)"><span>${phase}</span></label>`;
         }).join('');
       
@@ -1501,16 +1570,14 @@ function renderSidebar() {
         </div>`;
     });
     
-    const completedChapters = Object.keys(CHAPTERS[subj]).reduce((count, ch) => count + (isChapterComplete(subj, ch, phasesMap) ? 1 : 0), 0);
-    const totalChapters = Object.keys(CHAPTERS[subj]).length;
-    let pct = Math.round((completedChapters / (totalChapters||1)) * 100);
+    let pct = Math.round((progressedChapters / (totalChapters||1)) * 100);
     const isOpenClass = openAccordions.includes(subj) ? 'open' : '';
     
     html += `
       <div class="sb-subj ${isOpenClass}">
         <div class="sb-subj-header" onclick="toggleAccordion('${subj}')">
           <span style="color:${subjColor}; font-weight:bold;">${subjName}</span>
-          <span class="sb-pct" style="color:var(--text-dim); font-size:11px;">${completedChapters}/${totalChapters}</span>
+          <span class="sb-pct" style="color:var(--text-dim); font-size:11px;">${formatProgressValue(progressedChapters)}/${totalChapters}</span>
         </div>
         <div class="sb-progress"><div class="sb-progress-fill" style="width:${pct}%; background:${subjColor}; box-shadow: 0 0 8px ${subjColor}"></div></div>
         <div class="sb-subj-body">${chHTML}</div>

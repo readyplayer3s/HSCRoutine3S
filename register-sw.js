@@ -7,37 +7,35 @@ function notifyUpdateAvailable() {
 }
 
 if ('serviceWorker' in navigator) {
-  const hadController = !!navigator.serviceWorker.controller;
+  window.addEventListener('load', () => {
+    const hadController = !!navigator.serviceWorker.controller;
 
-  navigator.serviceWorker.register('./service-worker.js')
-    .then(reg => {
-      console.log('✓ Service Worker registered successfully');
-      console.log('Scope:', reg.scope);
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(reg => {
+        // trigger an update check immediately
+        try { reg.update(); } catch (e) {}
 
-      if (hadController && reg.waiting) {
-        notifyUpdateAvailable();
-      }
+        if (hadController && reg.waiting) {
+          notifyUpdateAvailable();
+        }
 
-      reg.addEventListener('updatefound', () => {
-        const installing = reg.installing;
-        if (!installing) return;
+        reg.addEventListener('updatefound', () => {
+          const installing = reg.installing;
+          if (!installing) return;
 
-        installing.addEventListener('statechange', () => {
-          if (installing.state === 'installed' && hadController) {
+          installing.addEventListener('statechange', () => {
+            if (installing.state === 'installed' && hadController) {
+              notifyUpdateAvailable();
+            }
+          });
+        });
+
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (hadController) {
             notifyUpdateAvailable();
           }
         });
-      });
-
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (hadController) {
-          notifyUpdateAvailable();
-        }
-      });
-    })
-    .catch(err => {
-      console.log('Service Worker registration failed:', err);
-    });
-} else {
-  console.log('Service Workers not supported in this browser');
+      })
+      .catch(() => {});
+  });
 }

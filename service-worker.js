@@ -7,39 +7,33 @@ const CACHE_NAME = 'hsc-routine-v1';
 const URLS_TO_CACHE = [
   './',
   './index.html',
+  './register-sw.js',
+  './service-worker.js',
   'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Share+Tech+Mono&family=Barlow:wght@300;400;500&display=swap'
 ];
 
 // Install event - cache essential files
 self.addEventListener('install', event => {
-  console.log('Service Worker installing...');
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Caching app shell');
-        return cache.addAll(URLS_TO_CACHE);
-      })
-      .catch(err => {
-        console.log('Cache addAll error:', err);
-      })
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    await Promise.all(URLS_TO_CACHE.map(async url => {
+      try {
+        const resp = await fetch(url, { mode: 'no-cors' });
+        if (resp) await cache.put(url, resp.clone());
+      } catch (e) {
+        // ignore individual failures
+      }
+    }));
+  })());
   self.skipWaiting(); // Activate immediately
 });
 
 // Activate event - clean up old caches
 self.addEventListener('activate', event => {
-  console.log('Service Worker activating...');
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    caches.keys().then(cacheNames => Promise.all(
+      cacheNames.map(cacheName => cacheName !== CACHE_NAME ? caches.delete(cacheName) : null)
+    ))
   );
   self.clients.claim();
 });
@@ -70,35 +64,20 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(request)
       .then(response => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
+        if (response) return response;
 
-        // Clone the request (it can only be used once)
         const fetchRequest = request.clone();
 
         return fetch(fetchRequest).then(response => {
-          // Check if valid response
-          if (!response || response.status !== 200 || response.type !== 'basic') {
+          if (!response || response.status !== 200) {
             return response;
           }
 
-          // Clone the response (it can only be used once)
           const responseToCache = response.clone();
-
-          // Cache successful requests for future offline use
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              cache.put(request, responseToCache);
-            });
-
+          caches.open(CACHE_NAME).then(cache => cache.put(request, responseToCache));
           return response;
         });
       })
-      .catch(() => {
-        // Network error - try to return cached version, otherwise offline fallback
-        return caches.match('./index.html').then(resp => resp || caches.match('./'));
-      })
+      .catch(() => caches.match('./index.html').then(resp => resp || caches.match('./')))
   );
 });
