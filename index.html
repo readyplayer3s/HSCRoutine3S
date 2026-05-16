@@ -245,7 +245,7 @@
   .offline-status.checking .offline-status-dot {
     background: var(--cyan);
     box-shadow: 0 0 8px rgba(0,212,255,0.6);
-    animation: pulse-dot 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    animation: none;
   }
   .offline-status.update-available {
     border-color: var(--amber);
@@ -256,7 +256,7 @@
   .offline-status.update-available .offline-status-dot {
     background: var(--amber);
     box-shadow: 0 0 10px rgba(240,165,0,0.6);
-    animation: pulse-dot 1.1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    animation: none;
   }
   @keyframes pulse-dot {
     0%, 100% { opacity: 1; transform: scale(1); }
@@ -350,9 +350,9 @@
         <h1>HSC 2026 — 50-Day Sprint</h1>
         <p>OPERATION: GPA 5.00 // CLEARANCE: MAXIMUM // STATUS: ACTIVE</p>
       </div>
-      <div class="offline-status checking" id="offline-status" title="Offline cache status">
+      <div class="offline-status not-cached" id="offline-status" title="Offline cache status">
         <div class="offline-status-dot"></div>
-        <span id="offline-status-text">Checking...</span>
+        <span id="offline-status-text">Checking Offline...</span>
       </div>
     </div>
     <div class="stats-row">
@@ -675,6 +675,48 @@ function saveState() {
   localStorage.setItem('hsc_chapter_prog', JSON.stringify(chapterProgress));
   localStorage.setItem('hsc_slot_prog', JSON.stringify(slotProgress));
   localStorage.setItem('hsc_slot_overrides', JSON.stringify(slotOverrides));
+}
+
+function buildDefaultChapterProgress() {
+  const defaults = {};
+  Object.keys(CHAPTERS).forEach(subj => {
+    defaults[subj] = {};
+    Object.keys(CHAPTERS[subj]).forEach(ch => {
+      defaults[subj][ch] = {A:false, B:false, C:false, R1:false, R2:false, R3:false};
+    });
+  });
+  return defaults;
+}
+
+function runReset(mode) {
+  if (mode === 'full' || mode === 'progress') {
+    chapterProgress = buildDefaultChapterProgress();
+    slotProgress = {};
+  }
+
+  if (mode === 'full' || mode === 'swaps') {
+    slotOverrides = {};
+  }
+
+  expandedDayIdx = null;
+  editingSlot = null;
+  openAccordions = [];
+
+  if (mode === 'full') {
+    currentFilter = 'ALL';
+    localStorage.removeItem('hsc_chapter_prog');
+    localStorage.removeItem('hsc_slot_prog');
+    localStorage.removeItem('hsc_slot_overrides');
+  } else {
+    saveState();
+  }
+
+  document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
+  const allFilterBtn = document.querySelector('.filter-btn[data-filter="ALL"]');
+  if (allFilterBtn) allFilterBtn.classList.add('active');
+
+  renderGrid();
+  renderSidebar();
 }
 
 function getSlotSubjects(dayIdx) {
@@ -1119,10 +1161,35 @@ document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
 });
 
 document.getElementById('reset-btn').addEventListener('click', () => {
-  if(confirm('Reset all tracking, progress, and custom swaps? This cannot be undone.')) {
-    chapterProgress = {}; Object.keys(CHAPTERS).forEach(s => { chapterProgress[s] = {}; Object.keys(CHAPTERS[s]).forEach(c => chapterProgress[s][c] = {A:false, B:false, C:false, R1:false, R2:false, R3:false}); });
-    slotProgress = {}; slotOverrides = {}; expandedDayIdx = null; saveState(); renderGrid(); renderSidebar();
+  const choice = prompt(
+    'Reset Options:\n1 = Full reset (progress + swaps)\n2 = Progress only\n3 = Swaps only\n\nType 1, 2, or 3:'
+  );
+
+  if (choice === null) return;
+
+  const selected = choice.trim();
+  if (!['1', '2', '3'].includes(selected)) {
+    alert('Invalid option. Reset cancelled.');
+    return;
   }
+
+  if (selected === '1') {
+    if (!confirm('Full reset will clear all progress and swaps. Continue?')) return;
+    runReset('full');
+    alert('Full reset complete.');
+    return;
+  }
+
+  if (selected === '2') {
+    if (!confirm('Reset only progress tracking and keep swaps?')) return;
+    runReset('progress');
+    alert('Progress reset complete.');
+    return;
+  }
+
+  if (!confirm('Reset only swaps/custom slot edits and keep progress?')) return;
+  runReset('swaps');
+  alert('Swaps reset complete.');
 });
 
 document.getElementById('guide-toggle').addEventListener('click', function() { 
@@ -1138,6 +1205,22 @@ renderGrid();
 // ─── OFFLINE STATUS DETECTION ──────────────────────────────────
 let offlineStatusRequestId = 0;
 let updateAvailable = false;
+let currentOfflineIndicatorKey = '';
+
+function setOfflineIndicatorState(stateClass, text, title) {
+  const statusEl = document.getElementById('offline-status');
+  const statusText = document.getElementById('offline-status-text');
+  if (!statusEl || !statusText) return;
+
+  const key = `${stateClass}|${text}|${title}`;
+  if (currentOfflineIndicatorKey === key) return;
+
+  statusEl.classList.remove('checking', 'cached', 'not-cached', 'update-available');
+  statusEl.classList.add(stateClass);
+  statusText.textContent = text;
+  statusEl.title = title;
+  currentOfflineIndicatorKey = key;
+}
 
 async function isAppShellCached(candidates) {
   const cacheNames = await caches.keys();
@@ -1160,23 +1243,15 @@ async function isAppShellCached(candidates) {
   return false;
 }
 
-async function updateOfflineStatus(showChecking = false) {
+async function updateOfflineStatus() {
   if (updateAvailable) return;
 
   const requestId = ++offlineStatusRequestId;
   const statusEl = document.getElementById('offline-status');
-  const statusText = document.getElementById('offline-status-text');
-  
   if (!statusEl) return;
 
   // Check if Service Worker is supported and registered
   if ('serviceWorker' in navigator && 'caches' in window) {
-    if (showChecking) {
-      statusEl.classList.add('checking');
-      statusEl.classList.remove('cached', 'not-cached', 'update-available');
-      statusText.textContent = 'Checking...';
-    }
-
     const candidates = [
       new URL('./index.html', window.location.href).href,
       new URL('./', window.location.href).href,
@@ -1193,45 +1268,26 @@ async function updateOfflineStatus(showChecking = false) {
       if (requestId !== offlineStatusRequestId) return;
 
       if (cached) {
-        statusEl.classList.remove('checking', 'not-cached', 'update-available');
-        statusEl.classList.add('cached');
-        statusText.textContent = 'Available Offline';
-        statusEl.title = 'This page is cached and should work offline';
+        setOfflineIndicatorState('cached', 'Available Offline', 'This page is cached and should work offline');
       } else {
-        statusEl.classList.remove('checking', 'cached', 'update-available');
-        statusEl.classList.add('not-cached');
-        statusText.textContent = 'Not Available Offline';
-        statusEl.title = 'Offline cache not ready yet. Keep page online for a moment.';
+        setOfflineIndicatorState('not-cached', 'Not Available Offline', 'Offline cache not ready yet. Keep page online for a moment.');
       }
     } catch {
       if (requestId !== offlineStatusRequestId) return;
-      statusEl.classList.remove('checking', 'cached', 'update-available');
-      statusEl.classList.add('not-cached');
-      statusText.textContent = 'Not Available Offline';
-      statusEl.title = 'Could not read offline cache';
+      setOfflineIndicatorState('not-cached', 'Not Available Offline', 'Could not read offline cache');
     }
   } else {
-    statusEl.classList.remove('checking', 'cached', 'update-available');
-    statusEl.classList.add('not-cached');
-    statusText.textContent = 'Not Available Offline';
-    statusEl.title = 'Your browser does not support offline mode';
+    setOfflineIndicatorState('not-cached', 'Not Available Offline', 'Your browser does not support offline mode');
   }
 }
 
 function showRefreshAvailable() {
-  const statusEl = document.getElementById('offline-status');
-  const statusText = document.getElementById('offline-status-text');
-  if (!statusEl || !statusText) return;
-
   updateAvailable = true;
-  statusEl.classList.remove('checking', 'cached', 'not-cached');
-  statusEl.classList.add('update-available');
-  statusText.textContent = 'Refresh Available';
-  statusEl.title = 'A new version is ready. Click to refresh.';
+  setOfflineIndicatorState('update-available', 'Refresh Available', 'A new version is ready. Click to refresh.');
 }
 
 // Update status on page load
-window.addEventListener('load', () => updateOfflineStatus(true));
+window.addEventListener('load', () => updateOfflineStatus());
 
 window.addEventListener('hsc-update-available', showRefreshAvailable);
 
@@ -1244,13 +1300,13 @@ if (offlineStatusEl) {
 }
 
 // Listen for online/offline events
-window.addEventListener('online', () => updateOfflineStatus(false));
-window.addEventListener('offline', () => updateOfflineStatus(false));
+window.addEventListener('online', () => updateOfflineStatus());
+window.addEventListener('offline', () => updateOfflineStatus());
 
 // Refresh status after service worker becomes active, without visual flicker
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.ready.then(() => updateOfflineStatus(false));
-  navigator.serviceWorker.addEventListener('controllerchange', () => updateOfflineStatus(false));
+  navigator.serviceWorker.ready.then(() => updateOfflineStatus());
+  navigator.serviceWorker.addEventListener('controllerchange', () => updateOfflineStatus());
 }
 </script>
 
