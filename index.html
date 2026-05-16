@@ -1131,31 +1131,42 @@ function updateOfflineStatus() {
     statusEl.classList.remove('cached', 'not-cached');
     statusText.textContent = 'Checking...';
 
-    // Check if index.html is cached
+    // Check if index/app shell is cached (scope-aware)
     caches.open('hsc-routine-v1').then(cache => {
-      cache.match('/index.html').then(response => {
-        if (response) {
+      const candidates = [
+        new URL('./index.html', window.location.href).href,
+        window.location.href,
+        window.location.pathname,
+        './index.html',
+        './',
+        '/index.html',
+        '/'
+      ];
+
+      Promise.all(candidates.map(candidate => cache.match(candidate)))
+      .then(matches => {
+        if (matches.some(Boolean)) {
           statusEl.classList.remove('checking', 'not-cached');
           statusEl.classList.add('cached');
-          statusText.textContent = 'Works Offline';
-          statusEl.title = 'Page is cached and will work offline';
+          statusText.textContent = 'Available Offline';
+          statusEl.title = 'This page is cached and should work offline';
         } else {
           statusEl.classList.remove('checking', 'cached');
           statusEl.classList.add('not-cached');
-          statusText.textContent = 'Not Cached Yet';
-          statusEl.title = 'Load the page online first to enable offline support';
+          statusText.textContent = 'Not Available Offline';
+          statusEl.title = 'Offline cache not ready yet. Keep page online for a moment.';
         }
       });
     }).catch(() => {
       statusEl.classList.remove('checking', 'cached');
       statusEl.classList.add('not-cached');
-      statusText.textContent = 'Caching Failed';
-      statusEl.title = 'Offline support is not available';
+      statusText.textContent = 'Not Available Offline';
+      statusEl.title = 'Could not read offline cache';
     });
   } else {
     statusEl.classList.remove('checking', 'cached');
     statusEl.classList.add('not-cached');
-    statusText.textContent = 'Not Supported';
+    statusText.textContent = 'Not Available Offline';
     statusEl.title = 'Your browser does not support offline mode';
   }
 }

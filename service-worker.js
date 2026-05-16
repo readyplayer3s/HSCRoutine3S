@@ -5,8 +5,8 @@ const CACHE_NAME = 'hsc-routine-v1';
 
 // Files to cache on first install
 const URLS_TO_CACHE = [
-  '/',
-  '/index.html',
+  './',
+  './index.html',
   'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Share+Tech+Mono&family=Barlow:wght@300;400;500&display=swap'
 ];
 
@@ -84,7 +84,7 @@ self.addEventListener('fetch', event => {
       })
       .catch(() => {
         // Network error - try to return cached version, otherwise offline fallback
-        return caches.match('/index.html');
+        return caches.match('./index.html').then(resp => resp || caches.match('./'));
       })
   );
 });
