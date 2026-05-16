@@ -71,6 +71,8 @@
   }
 
   .header-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+  .title-block { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex: 1; min-width: 0; }
+  .title-block-text { flex: 1; min-width: 0; }
   .title-block h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--amber); text-shadow: 0 0 20px rgba(240,165,0,0.4); line-height: 1; margin: 0; }
   .title-block p { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 2px; margin-top: 4px; margin-bottom: 0; }
   
@@ -203,6 +205,53 @@
   .phase-R1, .phase-R2, .phase-R3 { background: var(--day-r); color: #34d399; }
   .phase-BUF { background: #1a1a1a; color: #4a5568; border: 1px solid var(--text-dim); }
 
+  /* OFFLINE STATUS INDICATOR */
+  .offline-status {
+    display: flex; align-items: center; gap: 8px; padding: 6px 12px;
+    border-radius: 4px; border: 1px solid var(--border);
+    font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    background: rgba(255,255,255,0.02);
+  }
+  .offline-status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    animation: none; flex-shrink: 0;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
+  }
+  .offline-status.cached {
+    border-color: var(--green);
+    background: rgba(0,255,136,0.08);
+    color: var(--green);
+  }
+  .offline-status.cached .offline-status-dot {
+    background: var(--green);
+    box-shadow: 0 0 10px rgba(0,255,136,0.6), inset 0 0 4px rgba(0,255,136,0.8);
+  }
+  .offline-status.not-cached {
+    border-color: var(--text-dim);
+    background: rgba(255,255,255,0.02);
+    color: var(--text-dim);
+  }
+  .offline-status.not-cached .offline-status-dot {
+    background: var(--text-dim);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
+  }
+  .offline-status.checking {
+    border-color: var(--cyan);
+    background: rgba(0,212,255,0.08);
+    color: var(--cyan);
+  }
+  .offline-status.checking .offline-status-dot {
+    background: var(--cyan);
+    box-shadow: 0 0 8px rgba(0,212,255,0.6);
+    animation: pulse-dot 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.2); }
+  }
+
   /* CARD PROGRESS */
   .card-progress { height: 4px; background: var(--bg); width: 100%; margin-top: auto; border-top: 1px solid var(--border); transform: translateZ(0); }
   .card-progress-fill { height: 100%; background: linear-gradient(90deg, var(--green-dim), var(--green)); transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 0 8px rgba(0,255,136,0.4); will-change: width; }
@@ -280,8 +329,14 @@
 <header>
   <div class="header-top">
     <div class="title-block">
-      <h1>HSC 2026 — 50-Day Sprint</h1>
-      <p>OPERATION: GPA 5.00 // CLEARANCE: MAXIMUM // STATUS: ACTIVE</p>
+      <div class="title-block-text">
+        <h1>HSC 2026 — 50-Day Sprint</h1>
+        <p>OPERATION: GPA 5.00 // CLEARANCE: MAXIMUM // STATUS: ACTIVE</p>
+      </div>
+      <div class="offline-status checking" id="offline-status" title="Offline cache status">
+        <div class="offline-status-dot"></div>
+        <span id="offline-status-text">Checking...</span>
+      </div>
     </div>
     <div class="stats-row">
       <div class="stat">
@@ -1062,6 +1117,58 @@ document.getElementById('guide-toggle').addEventListener('click', function() {
 // ─── INIT ──────────────────────────────────────────────────────
 renderSidebar();
 renderGrid();
+
+// ─── OFFLINE STATUS DETECTION ──────────────────────────────────
+function updateOfflineStatus() {
+  const statusEl = document.getElementById('offline-status');
+  const statusText = document.getElementById('offline-status-text');
+  
+  if (!statusEl) return;
+
+  // Check if Service Worker is supported and registered
+  if ('serviceWorker' in navigator && 'caches' in window) {
+    statusEl.classList.add('checking');
+    statusEl.classList.remove('cached', 'not-cached');
+    statusText.textContent = 'Checking...';
+
+    // Check if index.html is cached
+    caches.open('hsc-routine-v1').then(cache => {
+      cache.match('/index.html').then(response => {
+        if (response) {
+          statusEl.classList.remove('checking', 'not-cached');
+          statusEl.classList.add('cached');
+          statusText.textContent = 'Works Offline';
+          statusEl.title = 'Page is cached and will work offline';
+        } else {
+          statusEl.classList.remove('checking', 'cached');
+          statusEl.classList.add('not-cached');
+          statusText.textContent = 'Not Cached Yet';
+          statusEl.title = 'Load the page online first to enable offline support';
+        }
+      });
+    }).catch(() => {
+      statusEl.classList.remove('checking', 'cached');
+      statusEl.classList.add('not-cached');
+      statusText.textContent = 'Caching Failed';
+      statusEl.title = 'Offline support is not available';
+    });
+  } else {
+    statusEl.classList.remove('checking', 'cached');
+    statusEl.classList.add('not-cached');
+    statusText.textContent = 'Not Supported';
+    statusEl.title = 'Your browser does not support offline mode';
+  }
+}
+
+// Update status on page load
+window.addEventListener('load', updateOfflineStatus);
+
+// Update status every 5 seconds for real-time feedback
+setInterval(updateOfflineStatus, 5000);
+
+// Listen for online/offline events
+window.addEventListener('online', updateOfflineStatus);
+window.addEventListener('offline', updateOfflineStatus);
 </script>
 
 <!-- Service Worker Registration for Offline Support -->
