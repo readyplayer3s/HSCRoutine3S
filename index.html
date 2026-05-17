@@ -693,7 +693,7 @@
   <div class="guide-inner">
     <div class="guide-block">
       <div class="guide-block-title">⚙ The Core System</div>
-      <div class="guide-text" style="margin-bottom:10px;line-height:1.7"> This is a <strong style="color:var(--cyan)">50-Day HSC Sprint</strong> built around marathon/oneshot classes. Every day has <strong style="color:var(--cyan)">6 slots</strong> — 4 strict science/math tracks, 1 dedicated buffer, and 1 mandatory language/ICT slot. Click any day card to expand and track slots. </div>
+      <div class="guide-text" style="margin-bottom:10px;line-height:1.7"> This is a <strong style="color:var(--cyan)">50-Day HSC Sprint</strong> built around marathon/oneshot classes. Every day has <strong style="color:var(--cyan)">7 slots</strong> — 4 strict science/math tracks, 1 dedicated buffer, and 2 language/ICT slots. Click any day card to expand and track slots. </div>
     </div>
     <div class="guide-block">
       <div class="guide-block-title">🔄 3-Day Extraction Cycle</div>
@@ -884,6 +884,7 @@ function buildLangSlots(totalDays) {
   let lastSubject = null;
   const s5 = [];
   const s6 = [];
+  const s7 = [];
   const s4Extra = {};
 
   const pickSubject = (forceSubject) => {
@@ -908,8 +909,9 @@ function buildLangSlots(totalDays) {
       lastItem = item;
       lastSubject = subject;
     }
-    s5.push([daySlots[0], daySlots[1]]);
-    s6.push(daySlots[2]);
+    s5.push(daySlots[0]);
+    s6.push(daySlots[1]);
+    s7.push(daySlots[2]);
   }
 
   for(let day = 42; day < 50; day++) {
@@ -920,12 +922,13 @@ function buildLangSlots(totalDays) {
     lastSubject = subject;
   }
 
-  return { s5, s6, s4Extra };
+  return { s5, s6, s7, s4Extra };
 }
 
 const langSlots = buildLangSlots(50);
 const s5 = langSlots.s5;
 const s6 = langSlots.s6;
+const s7 = langSlots.s7;
 const s4Extra = langSlots.s4Extra;
 
 const SCHEDULE = [];
@@ -938,7 +941,8 @@ for(let i=0; i<50; i++) {
     s3: s3[i] || "BUFFER",
     s4: s4Val,
     s5: s5[i] || "BUFFER",
-    s6: s6[i] || "BUFFER"
+    s6: s6[i] || "BUFFER",
+    s7: s7[i] || "BUFFER"
   });
 }
 
@@ -1047,7 +1051,7 @@ function getChapterPhasesMap() {
   });
 
   for(let i=0; i<50; i++) {
-    ['s1','s2','s3','s4','s5','s6'].forEach(key => {
+    ['s1','s2','s3','s4','s5','s6','s7'].forEach(key => {
       const slotID = `${i}-${key}`;
       const slotData = slotOverrides[slotID] || SCHEDULE[i][key];
       normalizeSlotItems(slotData).forEach(item => {
@@ -1146,7 +1150,7 @@ function runReset(mode) {
 }
 
 function getSlotSubjects(dayIdx) {
-  return ['s1','s2','s3','s4','s5','s6'].flatMap(k => {
+  return ['s1','s2','s3','s4','s5','s6','s7'].flatMap(k => {
      let data = slotOverrides[`${dayIdx}-${k}`] || SCHEDULE[dayIdx][k];
      return normalizeSlotItems(data).map(item => parseSlot(item).subj).filter(Boolean);
   });
@@ -1164,11 +1168,11 @@ function buildCardInner(idx) {
   const day = SCHEDULE[idx];
   const dayNum = idx + 1;
   let slotsDone = 0;
-  ['s1','s2','s3','s4','s5','s6'].forEach(k => { if(slotProgress[`${idx}-${k}`]) slotsDone++; });
-  const isDone = slotsDone === 6;
+  ['s1','s2','s3','s4','s5','s6','s7'].forEach(k => { if(slotProgress[`${idx}-${k}`]) slotsDone++; });
+  const isDone = slotsDone === 7;
 
-  const slotKeys = ['s1','s2','s3','s4','s5','s6'];
-  const slotLabels = ['S1','S2','S3','S4','S5','S6'];
+  const slotKeys = ['s1','s2','s3','s4','s5','s6','s7'];
+  const slotLabels = ['S1','S2','S3','S4','S5','S6','S7'];
   
   let summaryHTML = '<div class="card-slots">';
   let detailHTML = '<div class="card-detail">';
@@ -1266,11 +1270,11 @@ function buildCardInner(idx) {
   return `
     <div class="card-header" onclick="toggleCard(${idx})">
       <div class="day-num">DAY ${String(dayNum).padStart(2,'0')}</div>
-      <div class="day-status" style="border-color:${isDone?'var(--green)':'var(--border)'}; color:${isDone?'var(--green)':'var(--text-dim)'}">${slotsDone} / 6 SLOTS</div>
+      <div class="day-status" style="border-color:${isDone?'var(--green)':'var(--border)'}; color:${isDone?'var(--green)':'var(--text-dim)'}">${slotsDone} / 7 SLOTS</div>
     </div>
     ${summaryHTML}
     ${detailHTML}
-    <div class="card-progress"><div class="card-progress-fill" style="width: ${(slotsDone/6)*100}%"></div></div>`;
+    <div class="card-progress"><div class="card-progress-fill" style="width: ${(slotsDone/7)*100}%"></div></div>`;
 }
 
 function renderGrid() {
@@ -1294,8 +1298,8 @@ function renderGrid() {
   SCHEDULE.forEach((day, idx) => {
     const subjects = getSlotSubjects(idx);
     
-    let slotsDone = ['s1','s2','s3','s4','s5','s6'].filter(k => slotProgress[`${idx}-${k}`]).length;
-    let isDone = slotsDone === 6;
+    let slotsDone = ['s1','s2','s3','s4','s5','s6','s7'].filter(k => slotProgress[`${idx}-${k}`]).length;
+    let isDone = slotsDone === 7;
     let show = true;
     if(currentFilter === "DONE") show = isDone;
     else if(currentFilter !== "ALL") show = subjects.includes(currentFilter);
@@ -1426,16 +1430,16 @@ document.getElementById('grid').addEventListener('change', function(e) {
        if (isChecked) detailSlot.classList.add('done');
        else detailSlot.classList.remove('done');
 
-       let slotsDone = ['s1','s2','s3','s4','s5','s6'].filter(k => slotProgress[`${idx}-${k}`]).length;
+       let slotsDone = ['s1','s2','s3','s4','s5','s6','s7'].filter(k => slotProgress[`${idx}-${k}`]).length;
        
-       card.querySelector('.card-progress-fill').style.width = `${(slotsDone/6)*100}%`;
+       card.querySelector('.card-progress-fill').style.width = `${(slotsDone/7)*100}%`;
        const statusEl = card.querySelector('.day-status');
-       statusEl.textContent = `${slotsDone} / 6 SLOTS`;
+       statusEl.textContent = `${slotsDone} / 7 SLOTS`;
        
        const tickEl = card.querySelector(`.slot-tick[data-key="${key}"]`);
        if(tickEl) tickEl.innerHTML = isChecked ? '<span style="color:var(--green)">✔</span>' : '<span style="color:var(--text-dim)">○</span>';
 
-       if(slotsDone === 6) {
+       if(slotsDone === 7) {
            card.classList.add('completed');
            statusEl.style.borderColor = 'var(--green)';
            statusEl.style.color = 'var(--green)';
@@ -1454,7 +1458,7 @@ document.getElementById('grid').addEventListener('change', function(e) {
 window.toggleSidebarPhase = function(subj, ch, phase, isChecked) {
    chapterProgress[subj][ch][phase] = isChecked;
    for(let i=0; i<50; i++){
-      ['s1','s2','s3','s4','s5','s6'].forEach(key => {
+      ['s1','s2','s3','s4','s5','s6','s7'].forEach(key => {
          let slotID = `${i}-${key}`, slotData = slotOverrides[slotID] || SCHEDULE[i][key];
       normalizeSlotItems(slotData).forEach(item => {
         if(item !== 'BUFFER') {
