@@ -12,29 +12,47 @@ const URLS_TO_CACHE = [
   'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Share+Tech+Mono&family=Barlow:wght@300;400;500&display=swap'
 ];
 
+async function cacheResponse(cache, request, response) {
+  if (!response) return;
+
+  if (response.type === 'opaque' || response.ok) {
+    await cache.put(request, response.clone());
+  }
+}
+
+async function fallbackToAppShell(request) {
+  const cachedRequest = await caches.match(request);
+  if (cachedRequest) return cachedRequest;
+
+  return caches.match('./index.html').then(fallback => fallback || caches.match('./'));
+}
+
 // Install event - cache essential files
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
+
     await Promise.all(URLS_TO_CACHE.map(async url => {
       try {
-        const resp = await fetch(url, { mode: 'no-cors' });
-        if (resp) await cache.put(url, resp.clone());
-      } catch (e) {
-        // ignore individual failures
+        const response = await fetch(url, { mode: 'no-cors' });
+        await cacheResponse(cache, url, response);
+      } catch {
+        // Ignore individual failures during install so one bad asset does not block the app shell.
       }
     }));
   })());
-  self.skipWaiting(); // Activate immediately
+
+  self.skipWaiting();
 });
 
 // Activate event - clean up old caches
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => Promise.all(
-      cacheNames.map(cacheName => cacheName !== CACHE_NAME ? caches.delete(cacheName) : null)
+      cacheNames.map(cacheName => (cacheName === CACHE_NAME ? null : caches.delete(cacheName)))
     ))
   );
+
   self.clients.claim();
 });
 
@@ -47,37 +65,37 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // For page navigations, prefer network so users receive updated HTML.
+  const sameOrigin = new URL(request.url).origin === self.location.origin;
+
   if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request)
-        .then(response => {
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(request, responseToCache));
-          return response;
-        })
-        .catch(() => caches.match(request).then(resp => resp || caches.match('./index.html').then(fallback => fallback || caches.match('./'))))
-    );
+    event.respondWith((async () => {
+      try {
+        const response = await fetch(request);
+        const cache = await caches.open(CACHE_NAME);
+        await cacheResponse(cache, request, response);
+        return response;
+      } catch {
+        return fallbackToAppShell(request);
+      }
+    })());
     return;
   }
 
-  event.respondWith(
-    caches.match(request)
-      .then(response => {
-        if (response) return response;
+  event.respondWith((async () => {
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) return cachedResponse;
 
-        const fetchRequest = request.clone();
+    try {
+      const response = await fetch(request);
 
-        return fetch(fetchRequest).then(response => {
-          if (!response || response.status !== 200) {
-            return response;
-          }
+      if (sameOrigin) {
+        const cache = await caches.open(CACHE_NAME);
+        await cacheResponse(cache, request, response);
+      }
 
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(request, responseToCache));
-          return response;
-        });
-      })
-      .catch(() => caches.match('./index.html').then(resp => resp || caches.match('./')))
-  );
+      return response;
+    } catch {
+      return fallbackToAppShell(request);
+    }
+  })());
 });

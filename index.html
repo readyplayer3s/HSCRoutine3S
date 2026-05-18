@@ -42,13 +42,18 @@
     
     --day-a: #1e3a5f; --day-b: #3d2a00;
     --day-c: #3d0a0a; --day-r: #0a2d1a;
+
+    --font-body: 'Barlow', sans-serif;
+    --font-display: 'Barlow Condensed', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { overflow-x: hidden; width: 100%; scroll-behavior: smooth; }
 
   body {
-    background: var(--bg); color: var(--text); font-family: 'Barlow', sans-serif;
+    background: var(--bg); color: var(--text); font-family: var(--font-body);
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -81,12 +86,12 @@
   .header-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
   .title-block { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex: 1; min-width: 0; }
   .title-block-text { flex: 1; min-width: 0; }
-  .title-block h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; color: var(--amber); text-shadow: 0 0 24px rgba(240,165,0,0.5); line-height: 1; margin: 0; }
-  .title-block p { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 2px; margin-top: 4px; margin-bottom: 0; }
+  .title-block h1 { font-family: var(--font-display); font-size: 32px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; color: var(--amber); text-shadow: 0 0 24px rgba(240,165,0,0.5); line-height: 1; margin: 0; }
+  .title-block p { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); letter-spacing: 2px; margin-top: 4px; margin-bottom: 0; }
   
   .stats-row { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 14px; }
   .stat { text-align: left; padding: 12px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 8px 24px rgba(0,0,0,0.18); }
-  .stat-val { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; color: var(--cyan); line-height: 1; text-shadow: 0 0 18px rgba(0,212,255,0.4); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); transform: translateZ(0); letter-spacing: 1px; }
+  .stat-val { font-family: var(--font-display); font-size: 22px; font-weight: 900; color: var(--cyan); line-height: 1; text-shadow: 0 0 18px rgba(0,212,255,0.4); transition: all 0.3s var(--ease-out); transform: translateZ(0); letter-spacing: 1px; }
   .stat:hover .stat-val { transform: scale(1.08) translateZ(0); }
   .stat-label { font-family: 'Share Tech Mono', monospace; font-size: 8px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; font-weight: 700; line-height: 1.25; }
   .global-stat { border-color: rgba(0,212,255,0.25); background: linear-gradient(135deg, rgba(0,212,255,0.08) 0%, rgba(255,255,255,0.03) 100%); }
@@ -98,7 +103,7 @@
     border-radius: 10px;
     background: rgba(255,255,255,0.04);
     color: var(--text-dim);
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: var(--font-display);
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 1px;
@@ -131,12 +136,12 @@
   .progress-bar-bg { height: 12px; background: rgba(0,212,255,0.08); border-radius: 8px; overflow: hidden; position: relative; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5), 0 0 12px rgba(0,212,255,0.2); border: 1px solid var(--glass-border); }
   .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--cyan-dim), var(--cyan), #00ffff); border-radius: 8px; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1); position: relative; box-shadow: 0 0 24px rgba(0,212,255,0.9), inset 0 0 12px rgba(255,255,255,0.2), 0 0 40px rgba(0,212,255,0.6); will-change: width; }
   .progress-bar-fill::after { content: ''; position: absolute; right: 0; top: -2px; width: 14px; height: 14px; background: radial-gradient(circle, #fff, rgba(255,255,255,0.7)); border-radius: 50%; box-shadow: 0 0 16px rgba(255,255,255,0.9), 0 0 28px rgba(0,212,255,0.8); filter: drop-shadow(0 0 6px rgba(0,212,255,0.7)); }
-  .progress-text { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 800; color: var(--text-bright); margin-top: 8px; letter-spacing: 1.4px; text-transform: uppercase; text-shadow: 0 0 10px rgba(0,212,255,0.35); }
+  .progress-text { font-family: var(--font-display); font-size: 16px; font-weight: 800; color: var(--text-bright); margin-top: 8px; letter-spacing: 1.4px; text-transform: uppercase; text-shadow: 0 0 10px rgba(0,212,255,0.35); }
 
   /* CONTROLS */
   .controls { padding: 16px 24px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; border-bottom: 1px solid rgba(0,212,255,0.1); position: relative; z-index: 1; background: linear-gradient(180deg, rgba(13,17,23,0.5) 0%, rgba(8,11,16,0.3) 100%); }
-  .filter-label { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--text-dim); letter-spacing: 2.5px; text-transform: uppercase; margin-right: 4px; margin-left: auto; font-weight: 700; }
-  .filter-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 8px 18px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: var(--text-dim); cursor: pointer; border-radius: 12px; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); transform: translateZ(0); backdrop-filter: blur(12px); }
+  .filter-label { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); letter-spacing: 2.5px; text-transform: uppercase; margin-right: 4px; margin-left: auto; font-weight: 700; }
+  .filter-btn { font-family: var(--font-display); font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 8px 18px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: var(--text-dim); cursor: pointer; border-radius: 12px; transition: all 0.25s var(--ease-out); transform: translateZ(0); backdrop-filter: blur(12px); }
   .filter-btn:hover { border-color: var(--cyan); color: var(--cyan); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,212,255,0.4), inset 0 0 1px rgba(0,212,255,0.3); background: rgba(0,212,255,0.15); }
   .filter-btn.active { background: linear-gradient(135deg, rgba(0,212,255,0.35) 0%, rgba(0,212,255,0.15) 100%); border-color: var(--cyan); color: #fff; box-shadow: 0 8px 28px rgba(0,212,255,0.5), inset 0 1px 0 rgba(255,255,255,0.25); }
   .filter-btn[data-filter="DONE"].active { background: linear-gradient(135deg, rgba(0,255,136,0.35) 0%, rgba(0,255,136,0.15) 100%); border-color: var(--green); color: #fff; box-shadow: 0 8px 28px rgba(0,255,136,0.5); }
@@ -221,10 +226,10 @@
 
   .card-header { padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); cursor: pointer; transition: all 0.2s ease; background: var(--bg3); user-select: none; }
   .card-header:hover { background: rgba(255,255,255,0.06); transform: translateY(-1px); }
-  .day-num { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 900; color: var(--text-bright); letter-spacing: 2px; transition: all 0.3s ease; transform: skewY(-1.5deg); text-decoration-line: underline; text-decoration-color: #2fb7ff; text-decoration-thickness: 3px; text-underline-offset: 6px; text-shadow: 0 0 10px rgba(47,183,255,0.6), 0 0 18px rgba(47,183,255,0.35); }
-  .day-status { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--text-dim); letter-spacing: 1.5px; background: var(--bg); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); transition: all 0.3s ease; font-weight: 700; }
+  .day-num { font-family: var(--font-display); font-size: 24px; font-weight: 900; color: var(--text-bright); letter-spacing: 2px; transition: all 0.3s ease; transform: skewY(-1.5deg); text-decoration-line: underline; text-decoration-color: #2fb7ff; text-decoration-thickness: 3px; text-underline-offset: 6px; text-shadow: 0 0 10px rgba(47,183,255,0.6), 0 0 18px rgba(47,183,255,0.35); }
+  .day-status { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); letter-spacing: 1.5px; background: var(--bg); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); transition: all 0.3s ease; font-weight: 700; }
   
-  .day-expanded .day-num { color: var(--amber); text-shadow: 0 0 16px rgba(240,165,0,0.5), 0 0 10px rgba(47,183,255,0.5); transform: skewY(-1.5deg) scale(1.08); text-decoration-color: #2fb7ff; }
+  .day-expanded .day-num,
   .day-card.expanded .day-num { color: var(--amber); text-shadow: 0 0 16px rgba(240,165,0,0.5), 0 0 10px rgba(47,183,255,0.5); transform: skewY(-1.5deg) scale(1.08); text-decoration-color: #2fb7ff; }
 
   /* SLOTS & DETAILS */
@@ -297,9 +302,9 @@
   .offline-status {
     display: flex; align-items: center; gap: 8px; padding: 9px 15px;
     border-radius: 12px; border: 1px solid rgba(255,255,255,0.15);
-    font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600;
+    font-family: var(--font-display); font-size: 11px; font-weight: 600;
     letter-spacing: 1px; text-transform: uppercase;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.3s var(--ease-out);
     background: rgba(255,255,255,0.04);
   }
   .offline-status-dot {
@@ -360,7 +365,7 @@
     margin-right: auto;
   }
   .tracker-toggle-btn {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: var(--font-display);
     font-size: 13px;
     font-weight: 800;
     letter-spacing: 1.5px;
@@ -416,7 +421,7 @@
     z-index: 1;
   }
   .subject-tracker-title {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: var(--font-display);
     font-size: 26px;
     font-weight: 900;
     letter-spacing: 3px;
@@ -440,14 +445,14 @@
 
   .sb-ch { margin-bottom: 12px; border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
   .sb-ch:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
-  .sb-ch-title { font-size: 11px; color: var(--text); margin-bottom: 6px; font-family: 'Share Tech Mono', monospace; line-height: 1.3; }
+  .sb-ch-title { font-size: 11px; color: var(--text); margin-bottom: 6px; font-family: var(--font-mono); line-height: 1.3; }
   .sb-ch-ticks { display: flex; gap: 10px; }
-  .tick-label { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--text-dim); cursor: pointer; font-family: 'Barlow Condensed', sans-serif; font-weight: bold; transition: color 0.2s ease; }
+  .tick-label { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--text-dim); cursor: pointer; font-family: var(--font-display); font-weight: bold; transition: color 0.2s ease; }
   .tick-label:hover { color: var(--text-bright); }
   .tick-label input { accent-color: var(--cyan); width: 14px; height: 14px; cursor: pointer; transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1); }
   .tick-label input:active { transform: scale(0.75); }
 
-  .danger-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; padding: 6px 14px; border: 1.5px solid var(--red-dim); background: transparent; color: var(--red-dim); cursor: pointer; border-radius: 8px; transition: all 0.2s ease; margin-left: 8px; }
+  .danger-btn { font-family: var(--font-display); font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; padding: 6px 14px; border: 1.5px solid var(--red-dim); background: transparent; color: var(--red-dim); cursor: pointer; border-radius: 8px; transition: all 0.2s ease; margin-left: 8px; }
   .danger-btn:hover { border-color: var(--red); color: var(--red); background: rgba(255,68,68,0.12); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,68,68,0.25); }
 
   /* RESET MODAL */
@@ -473,7 +478,7 @@
     border-bottom: 1px solid rgba(255,68,68,0.15);
     background: rgba(255,68,68,0.08);
     color: var(--red);
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: var(--font-display);
     letter-spacing: 2px;
     font-size: 15px;
     font-weight: 900;
@@ -540,7 +545,7 @@
   }
   .reset-option-btn strong {
     display: block;
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: var(--font-display);
     font-size: 13px;
     letter-spacing: 1px;
     color: var(--text-bright);
@@ -577,7 +582,7 @@
     border-radius: 4px;
     padding: 7px 12px;
     cursor: pointer;
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: var(--font-display);
     font-size: 12px;
     letter-spacing: 1px;
     font-weight: 700;
@@ -612,7 +617,7 @@
     color: var(--text-dim);
     border-radius: 4px;
     padding: 6px 10px;
-    font-family: 'Share Tech Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 10px;
     letter-spacing: 1px;
     cursor: pointer;
@@ -622,16 +627,16 @@
     color: var(--text);
   }
 
-  .guide-toggle { width: 100%; padding: 12px 24px; background: var(--bg3); border: none; border-bottom: 1px solid var(--border); color: var(--cyan); font-family: 'Share Tech Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.2s ease; position: relative; z-index: 1; text-align: left; }
+  .guide-toggle { width: 100%; padding: 12px 24px; background: var(--bg3); border: none; border-bottom: 1px solid var(--border); color: var(--cyan); font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.2s ease; position: relative; z-index: 1; text-align: left; }
   .guide-toggle:hover { background: #181f2a; color: #fff; }
   .guide-toggle .arrow { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: inline-block; }
   .guide-toggle.open .arrow { transform: rotate(90deg); }
   .guide-panel { display: none; background: var(--bg2); border-bottom: 1px solid var(--cyan-dim); position: relative; z-index: 1; }
   .guide-panel.open { display: block; animation: slideDown 0.3s ease; }
   .guide-inner { padding: 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
-  .guide-block-title { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cyan); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  .guide-block-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cyan); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
   .guide-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
-  .guide-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1px; padding: 2px 8px; border-radius: 3px; flex-shrink: 0; min-width: 44px; text-align: center; }
+  .guide-badge { font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 1px; padding: 2px 8px; border-radius: 3px; flex-shrink: 0; min-width: 44px; text-align: center; }
   .guide-text { font-size: 12px; color: var(--text); line-height: 1.6; }
   .guide-text small { display: block; color: var(--text-dim); font-size: 11px; margin-top: 2px; }
   
@@ -1745,10 +1750,13 @@ switchTrackerView('days');
 let offlineStatusRequestId = 0;
 let updateAvailable = false;
 let currentOfflineIndicatorKey = '';
+const offlineStatusElements = {
+  root: document.getElementById('offline-status'),
+  text: document.getElementById('offline-status-text')
+};
 
 function setOfflineIndicatorState(stateClass, text, title) {
-  const statusEl = document.getElementById('offline-status');
-  const statusText = document.getElementById('offline-status-text');
+  const { root: statusEl, text: statusText } = offlineStatusElements;
   if (!statusEl || !statusText) return;
 
   const key = `${stateClass}|${text}|${title}`;
@@ -1762,18 +1770,6 @@ function setOfflineIndicatorState(stateClass, text, title) {
 }
 
 async function isAppShellCached(candidates) {
-  const cacheNames = await caches.keys();
-  const relevantCacheNames = cacheNames.filter(name => name.toLowerCase().includes('hsc-routine'));
-  const namesToCheck = relevantCacheNames.length ? relevantCacheNames : cacheNames;
-
-  for (const cacheName of namesToCheck) {
-    const cache = await caches.open(cacheName);
-    for (const candidate of candidates) {
-      const hit = await cache.match(candidate);
-      if (hit) return true;
-    }
-  }
-
   for (const candidate of candidates) {
     const hit = await caches.match(candidate);
     if (hit) return true;
@@ -1786,11 +1782,13 @@ async function updateOfflineStatus() {
   if (updateAvailable) return;
 
   const requestId = ++offlineStatusRequestId;
-  const statusEl = document.getElementById('offline-status');
+  const { root: statusEl } = offlineStatusElements;
   if (!statusEl) return;
 
   // Check if Service Worker is supported and registered
   if ('serviceWorker' in navigator && 'caches' in window) {
+    setOfflineIndicatorState('checking', 'Checking Offline...', 'Checking offline cache status');
+
     const candidates = [
       new URL('./index.html', window.location.href).href,
       new URL('./', window.location.href).href,
@@ -1826,13 +1824,12 @@ function showRefreshAvailable() {
 }
 
 // Update status on page load
-window.addEventListener('load', () => updateOfflineStatus());
+window.addEventListener('load', () => updateOfflineStatus(), { once: true });
 
 window.addEventListener('hsc-update-available', showRefreshAvailable);
 
-const offlineStatusEl = document.getElementById('offline-status');
-if (offlineStatusEl) {
-  offlineStatusEl.addEventListener('click', () => {
+if (offlineStatusElements.root) {
+  offlineStatusElements.root.addEventListener('click', () => {
     if (!updateAvailable) return;
     window.location.reload();
   });

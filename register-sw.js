@@ -2,7 +2,11 @@
 // Detects browser support and registers the Service Worker on page load
 // This enables offline functionality without modifying existing code
 
+let updateNotificationSent = false;
+
 function notifyUpdateAvailable() {
+  if (updateNotificationSent) return;
+  updateNotificationSent = true;
   window.dispatchEvent(new CustomEvent('hsc-update-available'));
 }
 
