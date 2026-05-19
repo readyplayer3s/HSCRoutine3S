@@ -132,6 +132,50 @@
     opacity: 1;
   }
 
+  .priority-strip {
+    margin-top: 14px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(240,165,0,0.2);
+    background: linear-gradient(135deg, rgba(240,165,0,0.08) 0%, rgba(19,26,36,0.6) 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 24px rgba(0,0,0,0.2);
+  }
+  .priority-strip-title {
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 8px;
+  }
+  .priority-strip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .priority-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text);
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.04);
+  }
+  .priority-chip strong {
+    color: var(--amber);
+    font-weight: 800;
+  }
+  .priority-empty {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
   .progress-wrap { width: 100%; transform: translateZ(0); }
   .progress-bar-bg { height: 12px; background: rgba(0,212,255,0.08); border-radius: 8px; overflow: hidden; position: relative; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5), 0 0 12px rgba(0,212,255,0.2); border: 1px solid var(--glass-border); }
   .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--cyan-dim), var(--cyan), #00ffff); border-radius: 8px; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1); position: relative; box-shadow: 0 0 24px rgba(0,212,255,0.9), inset 0 0 12px rgba(255,255,255,0.2), 0 0 40px rgba(0,212,255,0.6); will-change: width; }
@@ -145,6 +189,7 @@
   .filter-btn:hover { border-color: var(--cyan); color: var(--cyan); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,212,255,0.4), inset 0 0 1px rgba(0,212,255,0.3); background: rgba(0,212,255,0.15); }
   .filter-btn.active { background: linear-gradient(135deg, rgba(0,212,255,0.35) 0%, rgba(0,212,255,0.15) 100%); border-color: var(--cyan); color: #fff; box-shadow: 0 8px 28px rgba(0,212,255,0.5), inset 0 1px 0 rgba(255,255,255,0.25); }
   .filter-btn[data-filter="DONE"].active { background: linear-gradient(135deg, rgba(0,255,136,0.35) 0%, rgba(0,255,136,0.15) 100%); border-color: var(--green); color: #fff; box-shadow: 0 8px 28px rgba(0,255,136,0.5); }
+  .filter-btn[data-filter="PRIORITY"].active { background: linear-gradient(135deg, rgba(240,165,0,0.4) 0%, rgba(240,165,0,0.15) 100%); border-color: var(--amber); color: #fff; box-shadow: 0 8px 28px rgba(240,165,0,0.45); }
   .controls.subject-mode .filter-label,
   .controls.subject-mode .filter-btn[data-filter] {
     display: none;
@@ -445,7 +490,25 @@
 
   .sb-ch { margin-bottom: 12px; border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
   .sb-ch:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
-  .sb-ch-title { font-size: 11px; color: var(--text); margin-bottom: 6px; font-family: var(--font-mono); line-height: 1.3; }
+  .sb-ch-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+  .sb-ch-title { font-size: 11px; color: var(--text); font-family: var(--font-mono); line-height: 1.3; }
+  .priority-btn {
+    font-family: var(--font-display);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.04);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+  .priority-btn:hover { border-color: var(--amber); color: var(--amber); background: rgba(240,165,0,0.12); }
+  .priority-btn.active { border-color: var(--amber); color: #000; background: var(--amber); box-shadow: 0 0 12px rgba(240,165,0,0.35); }
   .sb-ch-ticks { display: flex; gap: 10px; }
   .tick-label { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--text-dim); cursor: pointer; font-family: var(--font-display); font-weight: bold; transition: color 0.2s ease; }
   .tick-label:hover { color: var(--text-bright); }
@@ -682,6 +745,10 @@
       </div>
     </div>
     <div class="stats-row" id="subject-stats"></div>
+    <div class="priority-strip" id="priority-strip">
+      <div class="priority-strip-title">Priority Chapters ⚠️</div>
+      <div class="priority-strip-list" id="priority-strip-list"></div>
+    </div>
   </div>
   <div class="progress-wrap">
     <div class="progress-bar-bg">
@@ -716,6 +783,8 @@
     <button class="tracker-toggle-btn" data-tracker-view="subjects" type="button">Subject Tracker</button>
   </div>
   
+  <button class="danger-btn" id="reset-btn">RESET</button>
+  
   <span class="filter-label">FILTER:</span>
   <button class="filter-btn active" data-filter="ALL">All</button>
   <button class="filter-btn" data-filter="P1" style="color:var(--p1);border-color:var(--p1)">P1</button>
@@ -727,8 +796,7 @@
   <button class="filter-btn" data-filter="B1" style="color:var(--b1);border-color:var(--b1)">B1</button>
   <button class="filter-btn" data-filter="B2" style="color:var(--b2);border-color:var(--b2)">B2</button>
   <button class="filter-btn" data-filter="DONE">✓ Done</button>
-  
-  <button class="danger-btn" id="reset-btn">RESET</button>
+  <button class="filter-btn" data-filter="PRIORITY" style="color:var(--amber);border-color:var(--amber)">⚠ Priority</button>
 </div>
 
 <div class="tracker-main" id="tracker-main">
@@ -970,6 +1038,31 @@ function normalizeSlotItems(slotData) {
 function getChName(subj, ch) { return (!subj || !CHAPTERS[subj]) ? "" : (CHAPTERS[subj][ch] || ch); }
 function getPhaseClass(phase) { return "phase-" + phase; }
 function getSubjColor(subj) { return SUBJ_COLORS[subj] || "var(--text-dim)"; }
+function getPriorityEmoji(subj, ch) {
+  return chapterPriority?.[subj]?.[ch] ? ' ⚠️' : '';
+}
+
+function renderPriorityList() {
+  const list = document.getElementById('priority-strip-list');
+  if (!list) return;
+
+  let hasAny = false;
+  let html = '';
+
+  SUBJECT_ORDER.forEach(subj => {
+    const chapters = Object.keys(CHAPTERS[subj] || {});
+    chapters.forEach(ch => {
+      if (!chapterPriority?.[subj]?.[ch]) return;
+      hasAny = true;
+      const chLabel = getChName(subj, ch).split(' | ')[0];
+      const subjLabel = SUBJ_NAMES[subj] || subj;
+      const color = getSubjColor(subj);
+      html += `<span class="priority-chip"><strong style="color:${color}">${subjLabel}</strong> Ch${ch}: ${chLabel}</span>`;
+    });
+  });
+
+  list.innerHTML = hasAny ? html : '<span class="priority-empty">No priority chapters yet.</span>';
+}
 
 function isChapterComplete(subj, ch, phasesMap) {
   const prog = chapterProgress[subj] && chapterProgress[subj][ch];
@@ -1077,6 +1170,7 @@ function getChapterPhasesMap() {
 let chapterProgress = JSON.parse(localStorage.getItem('hsc_chapter_prog') || '{}');
 let slotProgress = JSON.parse(localStorage.getItem('hsc_slot_prog') || '{}');
 let slotOverrides = JSON.parse(localStorage.getItem('hsc_slot_overrides') || '{}');
+let chapterPriority = JSON.parse(localStorage.getItem('hsc_chapter_priority') || '{}');
 let currentColsCount = 0;
 let currentFilter = "ALL";
 let expandedDayIdx = null;
@@ -1106,10 +1200,18 @@ Object.keys(CHAPTERS).forEach(subj => {
   });
 });
 
+Object.keys(CHAPTERS).forEach(subj => {
+  if(!chapterPriority[subj]) chapterPriority[subj] = {};
+  Object.keys(CHAPTERS[subj]).forEach(ch => {
+    if(chapterPriority[subj][ch] === undefined) chapterPriority[subj][ch] = false;
+  });
+});
+
 function saveState() {
   localStorage.setItem('hsc_chapter_prog', JSON.stringify(chapterProgress));
   localStorage.setItem('hsc_slot_prog', JSON.stringify(slotProgress));
   localStorage.setItem('hsc_slot_overrides', JSON.stringify(slotOverrides));
+  localStorage.setItem('hsc_chapter_priority', JSON.stringify(chapterPriority));
 }
 
 function buildDefaultChapterProgress() {
@@ -1122,6 +1224,26 @@ function buildDefaultChapterProgress() {
   });
   return defaults;
 }
+
+function buildDefaultChapterPriority() {
+  const defaults = {};
+  Object.keys(CHAPTERS).forEach(subj => {
+    defaults[subj] = {};
+    Object.keys(CHAPTERS[subj]).forEach(ch => {
+      defaults[subj][ch] = false;
+    });
+  });
+  return defaults;
+}
+
+window.toggleChapterPriority = function(subj, ch) {
+  if (!chapterPriority[subj]) chapterPriority[subj] = {};
+  chapterPriority[subj][ch] = !chapterPriority[subj][ch];
+  saveState();
+  renderSidebar();
+  renderGrid();
+  renderPriorityList();
+};
 
 function runReset(mode) {
   if (mode === 'full' || mode === 'progress') {
@@ -1138,10 +1260,12 @@ function runReset(mode) {
   openAccordions = [];
 
   if (mode === 'full') {
+    chapterPriority = buildDefaultChapterPriority();
     currentFilter = 'ALL';
     localStorage.removeItem('hsc_chapter_prog');
     localStorage.removeItem('hsc_slot_prog');
     localStorage.removeItem('hsc_slot_overrides');
+    localStorage.removeItem('hsc_chapter_priority');
   } else {
     saveState();
   }
@@ -1152,12 +1276,25 @@ function runReset(mode) {
 
   renderGrid();
   renderSidebar();
+  renderPriorityList();
 }
 
 function getSlotSubjects(dayIdx) {
   return ['s1','s2','s3','s4','s5','s6','s7'].flatMap(k => {
      let data = slotOverrides[`${dayIdx}-${k}`] || SCHEDULE[dayIdx][k];
      return normalizeSlotItems(data).map(item => parseSlot(item).subj).filter(Boolean);
+  });
+}
+
+function dayHasPriority(dayIdx) {
+  return ['s1','s2','s3','s4','s5','s6','s7'].some(k => {
+    const data = slotOverrides[`${dayIdx}-${k}`] || SCHEDULE[dayIdx][k];
+    return normalizeSlotItems(data).some(item => {
+      if (item === 'BUFFER') return false;
+      const p = parseSlot(item);
+      if (!p.subj || !p.ch) return false;
+      return chapterPriority?.[p.subj]?.[p.ch] === true;
+    });
   });
 }
 
@@ -1201,8 +1338,9 @@ function buildCardInner(idx) {
       const descParts = parsedItems.map(item => {
         const rawChName = getChName(item.subj, item.ch).split(" | ")[0];
         const isLang = ['L1','L2','E1','E2','IT'].includes(item.subj);
+        const priorityEmoji = getPriorityEmoji(item.subj, item.ch);
         const chPrefix = isLang ? '' : `Ch${item.ch} — `;
-        return `${item.subj} ${chPrefix}${rawChName}`;
+        return `${item.subj} ${chPrefix}${rawChName}${priorityEmoji}`;
       });
       const descHtml = isMulti ? descParts.join(" / ") : descParts[0];
       const descStyle = isMulti ? `color:${getSubjColor(p.subj)};white-space:normal` : `color:${getSubjColor(p.subj)}`;
@@ -1247,18 +1385,21 @@ function buildCardInner(idx) {
         const color = getSubjColor(p.subj);
         const isLang = ['L1','L2','E1','E2','IT'].includes(p.subj);
         const rawChName = getChName(p.subj, p.ch);
-        const chPrefix = isLang ? '' : `Ch${p.ch}`;
+        const priorityEmoji = getPriorityEmoji(p.subj, p.ch);
+        const rawChNameWithPriority = isLang ? `${rawChName}${priorityEmoji}` : rawChName;
+        const chPrefix = isLang ? '' : `Ch${p.ch}${priorityEmoji}`;
         const phaseLabel = parsedItems.map(item => item.phase).join('+');
         const extraLines = parsedItems.slice(1).map(item => {
           const raw = getChName(item.subj, item.ch);
-          return `<div class="detail-desc" style="color:${getSubjColor(item.subj)};opacity:0.8;margin-bottom:4px">${raw}</div>`;
+          const extraPriorityEmoji = getPriorityEmoji(item.subj, item.ch);
+          return `<div class="detail-desc" style="color:${getSubjColor(item.subj)};opacity:0.8;margin-bottom:4px">${raw}${extraPriorityEmoji}</div>`;
         }).join('');
         detailHTML += `
           <div class="detail-slot ${isChecked?'done':''}">
             <input type="checkbox" class="slot-check" data-id="${slotID}" ${isChecked?'checked':''}>
             <div class="detail-content">
               <div class="detail-title" style="color:${color}">${SUBJ_NAMES[p.subj] || p.subj} — ${chPrefix}</div>
-              <div class="detail-desc" style="color:${color};opacity:0.8;margin-bottom:4px">${rawChName}</div>
+              <div class="detail-desc" style="color:${color};opacity:0.8;margin-bottom:4px">${rawChNameWithPriority}</div>
               ${extraLines}
               <div class="detail-desc">${PHASE_DESC[p.phase] || 'Custom Task'}</div>
             </div>
@@ -1307,6 +1448,7 @@ function renderGrid() {
     let isDone = slotsDone === 7;
     let show = true;
     if(currentFilter === "DONE") show = isDone;
+    else if(currentFilter === "PRIORITY") show = dayHasPriority(idx);
     else if(currentFilter !== "ALL") show = subjects.includes(currentFilter);
     if(!show) return;
 
@@ -1567,6 +1709,8 @@ function renderSidebar() {
       const chapterComplete = chapterCounts.complete;
       const chapterFraction = chapterCounts.total ? (chapterCounts.done / chapterCounts.total) : 0;
       progressedChapters += chapterFraction;
+      const priorityEmoji = getPriorityEmoji(subj, ch);
+      const priorityActive = chapterPriority?.[subj]?.[ch];
       
       let tickHTML = phases.map(phase => {
           return `<label class="tick-label"><input type="checkbox" ${prog[phase]?'checked':''} onchange="toggleSidebarPhase('${subj}', '${ch}', '${phase}', this.checked)"><span>${phase}</span></label>`;
@@ -1574,7 +1718,10 @@ function renderSidebar() {
       
       chHTML += `
         <div class="sb-ch">
-          <div class="sb-ch-title">Ch ${ch}: ${chTitle.split(' | ')[0]}${chapterComplete ? ' • COMPLETE' : ` • ${chapterCounts.done}/${chapterCounts.total}`}</div>
+          <div class="sb-ch-head">
+            <div class="sb-ch-title">Ch ${ch}: ${chTitle.split(' | ')[0]}${priorityEmoji}${chapterComplete ? ' • COMPLETE' : ` • ${chapterCounts.done}/${chapterCounts.total}`}</div>
+            <button class="priority-btn ${priorityActive ? 'active' : ''}" type="button" onclick="toggleChapterPriority('${subj}', '${ch}')">${priorityActive ? 'Priority' : 'Mark priority'}</button>
+          </div>
           <div class="sb-ch-ticks">${tickHTML}</div>
         </div>`;
     });
@@ -1745,6 +1892,7 @@ document.getElementById('guide-toggle').addEventListener('click', function() {
 renderSidebar();
 renderGrid();
 switchTrackerView('days');
+renderPriorityList();
 
 // ─── OFFLINE STATUS DETECTION ──────────────────────────────────
 let offlineStatusRequestId = 0;
